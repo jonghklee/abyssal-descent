@@ -89,8 +89,8 @@ class Game {
                 } else if (e.code === 'Digit3') {
                     this.state = 'soulforge';
                 } else if (e.code === 'Digit4' && this.saveSystem && this.saveSystem.hasSave) {
-                    // Continue from save
-                    this.startGame();
+                    // Continue from save (skip class select)
+                    this.startGame(true);
                     const saveData = this.saveSystem.load();
                     if (saveData) {
                         this.saveSystem.restoreGame(this, saveData);
@@ -209,17 +209,13 @@ class Game {
         this.canvas.addEventListener('contextmenu', (e) => e.preventDefault());
     }
 
-    startGame() {
+    startGame(skipClassSelect = false) {
         this.state = 'playing';
         this.floor = 1;
         this.player = new Player(0, 0);
         this.ui.titleScreen = false;
         this.ui.deathScreen = false;
         this.ui.deathTimer = 0;
-
-        // Give starter weapon
-        const starterWeapon = new Weapon('sword', 'common');
-        this.player.weapons.push(starterWeapon);
 
         // Skills
         this.skills = new SkillSystem(this.player);
@@ -251,6 +247,7 @@ class Game {
         this.saveSystem = new SaveSystem();
         this.tutorial = new Tutorial();
         this.codex = new Codex();
+        this.classSelect = new ClassSelect();
 
         // Apply meta-progression bonuses
         this.meta.applyToPlayer(this.player);
@@ -274,6 +271,16 @@ class Game {
         if (this.tutorial) {
             this.tutorial.start();
             this.tutorial.trigger('start');
+        }
+
+        // Show class selection (skip if loading save)
+        if (!skipClassSelect && this.classSelect) {
+            this.classSelect.show();
+        }
+
+        // Give default weapon (class select will override)
+        if (this.player.weapons.length === 0) {
+            this.player.weapons.push(new Weapon('sword', 'common'));
         }
 
         this.generateFloor();
@@ -469,6 +476,28 @@ class Game {
         this.ui.update(dt);
 
         if (this.state !== 'playing') return;
+
+        // Class selection pauses game
+        if (this.classSelect && this.classSelect.active) {
+            this.classSelect.update(dt);
+            this.classSelect.handleMouseMove(this.input.mouse.x, this.input.mouse.y,
+                this.canvas.width, this.canvas.height);
+            // Key selection
+            const classIds = Object.keys(CLASS_DEFS);
+            for (let i = 0; i < classIds.length; i++) {
+                if (this.input.keys[`Digit${i + 1}`]) {
+                    this.classSelect.select(classIds[i], this.player);
+                    this.input.keys[`Digit${i + 1}`] = false;
+                    break;
+                }
+            }
+            // Mouse click selection
+            if (this.input.mouseJustPressed && this.classSelect.hoveredIndex >= 0) {
+                this.classSelect.select(classIds[this.classSelect.hoveredIndex], this.player);
+            }
+            this.input.mouseJustPressed = false;
+            return;
+        }
 
         // Codex screen pauses game
         if (this.codex && this.codex.showScreen) {
@@ -1320,6 +1349,11 @@ class Game {
         // ---- Crosshair ----
         if (this.state === 'playing') {
             this.ui.drawCrosshair(ctx, this.input.mouse.x, this.input.mouse.y);
+        }
+
+        // ---- Class Select ----
+        if (this.classSelect && this.classSelect.active) {
+            this.classSelect.draw(ctx, w, h);
         }
 
         // ---- Codex ----

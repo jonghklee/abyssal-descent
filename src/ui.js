@@ -123,11 +123,12 @@ class GameUI {
         ctx.fillStyle = '#64ffda';
         ctx.fillRect(hpX, xpY, xpBarW * xpPercent, xpBarH);
 
-        // Level
+        // Level + class
         ctx.fillStyle = '#64ffda';
         ctx.font = 'bold 11px monospace';
         ctx.textAlign = 'left';
-        ctx.fillText(`Lv.${player.level}`, hpX, xpY + 16);
+        const classIcon = player.classIcon || '';
+        ctx.fillText(`${classIcon} Lv.${player.level}`, hpX, xpY + 16);
 
         // ---- Dash cooldown ----
         const dashY = xpY + 22;
