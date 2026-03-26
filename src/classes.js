@@ -36,6 +36,20 @@ const CLASS_DEFS = {
         passive: 'Arcane: Skill cooldowns -30%',
         passiveApply: (p) => { p.skillCdReduction = 0.7; },
     },
+    // HIDDEN CLASS — unlocked by playing all 3 classes + reaching floor 10
+    necromancer: {
+        name: 'Necromancer',
+        icon: '💀',
+        color: '#e040fb',
+        desc: 'Summon undead, drain life. Starts with Void Staff.',
+        stats: { maxHp: 60, attack: 10, defense: 0, speed: 130, critChance: 0.05, critMultiplier: 2.0, lifesteal: 0.10 },
+        weapon: { type: 'staff', rarity: 'uncommon' },
+        potions: 2,
+        passive: 'Undying: Kill enemies to summon skeleton allies (max 3)',
+        passiveApply: (p) => { p.necroSummon = true; p.necroMax = 3; p.necroCount = 0; },
+        hidden: true,
+        unlockCondition: 'Play all 3 base classes & reach floor 10',
+    },
 };
 
 class ClassSelect {
@@ -44,6 +58,21 @@ class ClassSelect {
         this.selectedClass = null;
         this.hoveredIndex = -1;
         this.animTimer = 0;
+    }
+
+    isHiddenUnlocked() {
+        if (typeof game === 'undefined' || !game.meta) return false;
+        const d = game.meta.data;
+        const classesPlayed = d.classesPlayed ? Object.keys(d.classesPlayed).length : 0;
+        return classesPlayed >= 3 && d.bestFloor >= 10;
+    }
+
+    getAvailableClasses() {
+        const classes = Object.entries(CLASS_DEFS).filter(([id, cls]) => {
+            if (cls.hidden) return this.isHiddenUnlocked();
+            return true;
+        });
+        return classes;
     }
 
     show() {
@@ -112,7 +141,7 @@ class ClassSelect {
         ctx.fillText('Each class has unique stats, weapon, and passive ability', w / 2, h * 0.17);
 
         // Class cards
-        const classes = Object.entries(CLASS_DEFS);
+        const classes = this.getAvailableClasses();
         const cardW = 240;
         const cardH = 320;
         const gap = 30;

@@ -508,6 +508,30 @@ class CombatSystem {
             }
         }
 
+        // Necromancer passive: summon skeleton on kill
+        if (player.necroSummon && typeof game !== 'undefined') {
+            if (!player._necroAllies) player._necroAllies = [];
+            // Remove dead allies
+            player._necroAllies = player._necroAllies.filter(a => a.alive);
+
+            if (player._necroAllies.length < (player.necroMax || 3) && Math.random() < 0.3) {
+                const ally = new Enemy(enemy.x, enemy.y, 'skeleton');
+                ally.isAlly = true;
+                ally.name = '💀 Skeleton Ally';
+                ally.maxHp = 30 + player.level * 5;
+                ally.hp = ally.maxHp;
+                ally.baseAttack = Math.floor(player.attack * 0.3);
+                ally.speed = 100;
+                ally.xpReward = 0;
+                ally.goldReward = 0;
+                // Allies don't attack player — handled by checking isAlly in combat
+                player._necroAllies.push(ally);
+                game.enemies.push(ally); // Add to enemy list for rendering
+                particles.explosion(enemy.x, enemy.y, '#e040fb', 15);
+                game.ui.notify('💀 Skeleton summoned!', '#e040fb', 1.5);
+            }
+        }
+
         GameAudio.play(enemy.isBoss ? 'bossDeath' : 'enemyDeath');
     }
 

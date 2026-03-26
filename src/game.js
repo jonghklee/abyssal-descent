@@ -535,7 +535,7 @@ class Game {
             this.classSelect.handleMouseMove(this.input.mouse.x, this.input.mouse.y,
                 this.canvas.width, this.canvas.height);
             // Key selection
-            const classIds = Object.keys(CLASS_DEFS);
+            const classIds = this.classSelect.getAvailableClasses().map(([id]) => id);
             for (let i = 0; i < classIds.length; i++) {
                 if (this.input.keys[`Digit${i + 1}`]) {
                     this.classSelect.select(classIds[i], this.player);
@@ -804,6 +804,7 @@ class Game {
         // Enemies
         for (const enemy of this.enemies) {
             if (!enemy.alive) continue;
+            if (enemy.isAlly) continue; // Skip necromancer allies (they just exist as visuals)
 
             // Frozen Hourglass relic: slow nearby enemies
             if (this.player.auraSlowPct) {
@@ -863,6 +864,38 @@ class Game {
                     }
                 }
             }
+        }
+
+        // Necromancer allies attack nearby enemies
+        for (const ally of this.enemies) {
+            if (!ally.isAlly || !ally.alive) continue;
+            // Find nearest non-ally enemy
+            let nearest = null, nearDist = 80;
+            for (const e of this.enemies) {
+                if (e.isAlly || !e.alive) continue;
+                const d = Utils.dist(ally.x, ally.y, e.x, e.y);
+                if (d < nearDist) { nearDist = d; nearest = e; }
+            }
+            if (nearest) {
+                // Move toward and attack
+                const angle = Utils.angle(ally.x, ally.y, nearest.x, nearest.y);
+                ally.x += Math.cos(angle) * 80 * dt;
+                ally.y += Math.sin(angle) * 80 * dt;
+                if (nearDist < 25 && ally.attackCooldown <= 0) {
+                    nearest.takeDamage(ally.baseAttack, ally.x, ally.y);
+                    ally.attackCooldown = 1.5;
+                    particles.hitSpark(nearest.x, nearest.y, '#e040fb', 3);
+                }
+            } else {
+                // Follow player
+                const angle = Utils.angle(ally.x, ally.y, this.player.x, this.player.y);
+                const dist = Utils.dist(ally.x, ally.y, this.player.x, this.player.y);
+                if (dist > 50) {
+                    ally.x += Math.cos(angle) * 60 * dt;
+                    ally.y += Math.sin(angle) * 60 * dt;
+                }
+            }
+            if (ally.attackCooldown > 0) ally.attackCooldown -= dt;
         }
 
         // Combat system
