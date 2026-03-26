@@ -495,6 +495,18 @@ class Game {
         enemy.xpReward = Math.floor(enemy.xpReward * scale * 1.2); // More XP in endless
         enemy.goldReward = Math.floor(enemy.goldReward * scale);
 
+        // Golden variant (rare, 3% chance) — massive rewards
+        if (Math.random() < 0.03 && !enemy.isBoss) {
+            enemy.isGolden = true;
+            enemy.name = '✦ Golden ' + enemy.name;
+            enemy.color = '#ffd740';
+            enemy.xpReward *= 5;
+            enemy.goldReward *= 10;
+            enemy.maxHp = Math.floor(enemy.maxHp * 0.5); // Fragile but rewarding
+            enemy.hp = enemy.maxHp;
+            enemy.speed *= 1.5; // Fast — hard to catch
+        }
+
         // Ascension modifiers
         if (this.ascension && this.ascension.level > 0) {
             this.ascension.applyToEnemy(enemy, this);

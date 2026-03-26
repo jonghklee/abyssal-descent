@@ -454,6 +454,31 @@ class CombatSystem {
             if (game.vfx) game.vfx.critSlash(Utils.angle(player.x, player.y, enemy.x, enemy.y));
         }
 
+        // Golden enemy death celebration
+        if (enemy.isGolden) {
+            Utils.addSlowMo(0.2, 0.5);
+            Utils.addFreeze(5);
+            Utils.addFlash('#ffd740', 0.4);
+            Utils.addShake(10);
+            particles.explosion(enemy.x, enemy.y, '#ffd740', 40);
+            for (let i = 0; i < 20; i++) {
+                particles.add(new Particle(enemy.x + Utils.rand(-15,15), enemy.y + Utils.rand(-15,15), {
+                    life: Utils.rand(0.5, 1.2), size: Utils.rand(2, 5), endSize: 0,
+                    color: Utils.randChoice(['#ffd740', '#ffab00', '#fff176']),
+                    vx: Utils.rand(-4, 4), vy: Utils.rand(-5, -1),
+                    glow: true, glowSize: 8, gravity: 0.1,
+                }));
+            }
+            if (typeof game !== 'undefined') {
+                game.ui.notify(`✦ GOLDEN KILL! +${enemy.goldReward}g +${enemy.xpReward}xp!`, '#ffd740', 3);
+                if (game.vfx) game.vfx.legendaryBeam(
+                    enemy.x - game.camera.x + game.camera.halfW,
+                    enemy.y - game.camera.y + game.camera.halfH
+                );
+            }
+            GameAudio.play('bossDeath');
+        }
+
         // Type-specific death effects
         const deathColors = {
             slime: '#66bb6a', skeleton: '#e0e0e0', bat: '#ce93d8',

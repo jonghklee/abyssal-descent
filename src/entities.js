@@ -95,8 +95,23 @@ class Entity {
         }
 
         if (this.hp <= 0) {
-            this.hp = 0;
-            this.alive = false;
+            // Last Stand: 10% chance to survive lethal hit (player only)
+            if (this.className && !this._lastStandUsed && Math.random() < 0.10) {
+                this._lastStandUsed = true;
+                this.hp = 1;
+                this.invulnerable = 2;
+                if (typeof game !== 'undefined') {
+                    game.ui.notify('💀 LAST STAND! Survived at 1 HP!', '#ff1744', 3);
+                    Utils.addSlowMo(0.15, 1.0);
+                    Utils.addShake(12);
+                    Utils.addFlash('#ff1744', 0.4);
+                    if (game.vfx) game.vfx.screenCrack();
+                    GameAudio.play('bossDeath');
+                }
+            } else {
+                this.hp = 0;
+                this.alive = false;
+            }
         }
 
         return true;
