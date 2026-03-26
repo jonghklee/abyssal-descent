@@ -74,8 +74,24 @@ class Game {
     }
 
     setupInput() {
+        // Easter egg sequence tracker
+        this._eggBuffer = '';
+
         window.addEventListener('keydown', (e) => {
             this.input.keys[e.code] = true;
+
+            // Easter egg: type "ABYSS" for bonus
+            if (e.key.length === 1) {
+                this._eggBuffer = (this._eggBuffer + e.key.toUpperCase()).slice(-5);
+                if (this._eggBuffer === 'ABYSS' && this.state === 'playing' && this.player) {
+                    this.player.gold += 999;
+                    this.player.potions += 5;
+                    this.ui.notify('🌀 The Abyss whispers... +999g +5 potions!', '#7c4dff', 4);
+                    Utils.addFlash('#7c4dff', 0.3);
+                    GameAudio.play('levelUp');
+                    this._eggBuffer = '';
+                }
+            }
 
             // Title screen menu
             if (this.state === 'title') {

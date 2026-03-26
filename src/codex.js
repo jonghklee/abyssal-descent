@@ -2,6 +2,22 @@
 // CODEX - Collection tracking & unlockable lore
 // ============================================
 
+const ENEMY_LORE = {
+    skeleton: 'Ancient warriors cursed to eternal unrest.',
+    slime: 'Gelatinous blobs that dissolve anything they touch.',
+    bat: 'Swarms of darkness that echo through the crypt.',
+    zombie: 'The freshly risen dead, driven by insatiable hunger.',
+    ghost: 'Tortured spirits phasing through solid matter.',
+    mage: 'Dark sorcerers who traded their souls for power.',
+    knight: 'Fallen champions corrupted by the abyss.',
+    assassin: 'Shadow killers that strike from the darkness.',
+    necromancer: 'Masters of death magic who raise armies.',
+    golem_enemy: 'Ancient stone guardians awakened by intruders.',
+    boss_demon: 'A lord of the abyss, born from pure malice.',
+    boss_lich: 'An undead king whose magic defies death itself.',
+    boss_dragon: 'The ancient wyrm that guards the deepest depths.',
+};
+
 class Codex {
     constructor() {
         this.data = this.load();
@@ -216,10 +232,11 @@ class Codex {
         return allTypes.map(type => {
             const def = ENEMY_TYPES[type];
             const data = this.data.enemies[type];
+            const lore = ENEMY_LORE[type] || '';
             return {
                 found: !!data,
                 name: data ? data.name : def.name,
-                detail: data ? `Killed: ${data.killed}` : '',
+                detail: data ? `Killed: ${data.killed} | ${lore}` : '',
                 color: def.isBoss ? '#ff1744' : '#78909c',
             };
         });
