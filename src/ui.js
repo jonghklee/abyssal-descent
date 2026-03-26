@@ -621,6 +621,20 @@ class GameUI {
                 ctx.fillText(s.value.toString(), cardX + cardW - 30, sy);
             }
 
+            // Run highlight
+            ctx.textAlign = 'center';
+            const highlights = [];
+            if (player.kills >= 100) highlights.push(`${player.kills} kills!`);
+            if (player.maxCombo >= 15) highlights.push(`${player.maxCombo}x combo!`);
+            if (player._lastStandUsed) highlights.push('Last Stand!');
+            if (player.relics && player.relics.length >= 5) highlights.push(`${player.relics.length} relics!`);
+            if (typeof game !== 'undefined' && game.killStreak?.bestStreak >= 10) highlights.push(`${game.killStreak.bestStreak} streak!`);
+            if (highlights.length > 0) {
+                ctx.fillStyle = '#546e7a';
+                ctx.font = '9px monospace';
+                ctx.fillText(`Highlights: ${highlights.join(' · ')}`, w / 2, cardY + 42 + stats.length * 24 + 8);
+            }
+
             // Souls earned
             ctx.textAlign = 'center';
             const soulsEarned = (typeof game !== 'undefined' && game.soulsEarned) || 0;
