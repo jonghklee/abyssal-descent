@@ -254,7 +254,7 @@ class ItemManager {
                     const emoji = rarityIdx >= 4 ? '🌟' : '✨';
                     game.ui.notify(`${emoji} ${weapon.rarity.toUpperCase()} weapon dropped!`, weapon.getRarityColor(), 3);
                 }
-                GameAudio.play('levelUp');
+                GameAudio.play('rareDrop');
             }
         }
     }

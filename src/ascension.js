@@ -176,6 +176,7 @@ class ComboFinisher {
             // Find highest available finisher
             for (let i = this.thresholds.length - 1; i >= 0; i--) {
                 if (player.combo >= this.thresholds[i].combo) {
+                    if (!this.ready) GameAudio.play('comboReady'); // Sound on first ready
                     this.ready = true;
                     this.type = this.thresholds[i];
                     break;

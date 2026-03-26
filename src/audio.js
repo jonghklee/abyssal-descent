@@ -36,6 +36,8 @@ const GameAudio = {
                 case 'stairs': this.playStairs(); break;
                 case 'chest': this.playChest(); break;
                 case 'trap': this.playTrap(); break;
+                case 'rareDrop': this.playRareDrop(); break;
+                case 'comboReady': this.playComboReady(); break;
             }
         } catch (e) {
             // Silently fail audio
@@ -186,6 +188,19 @@ const GameAudio = {
     playTrap() {
         this.createNoise(0.2, 0.15);
         this.createOsc('sawtooth', 100, 0.15, 0.12);
+    },
+
+    playRareDrop() {
+        // Ascending sparkle sound
+        const notes = [523, 784, 1047, 1319, 1568];
+        notes.forEach((freq, i) => {
+            setTimeout(() => this.createOsc('sine', freq, 0.15, 0.08), i * 60);
+        });
+    },
+
+    playComboReady() {
+        this.createOsc('sine', 880, 0.08, 0.06);
+        setTimeout(() => this.createOsc('sine', 1320, 0.1, 0.08), 80);
     },
 
     // ---- Ambient Music System ----
