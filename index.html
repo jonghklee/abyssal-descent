@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abyssal Descent</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0a0a0f;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+        }
+        #gameCanvas {
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            cursor: none;
+        }
+        #ui-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    <div id="ui-overlay"></div>
+    <script src="src/utils.js"></script>
+    <script src="src/particles.js"></script>
+    <script src="src/dungeon.js"></script>
+    <script src="src/entities.js"></script>
+    <script src="src/combat.js"></script>
+    <script src="src/items.js"></script>
+    <script src="src/ui.js"></script>
+    <script src="src/audio.js"></script>
+    <script src="src/skills.js"></script>
+    <script src="src/perks.js"></script>
+    <script src="src/gacha.js"></script>
+    <script src="src/events.js"></script>
+    <script src="src/enchant.js"></script>
+    <script src="src/achievements.js"></script>
+    <script src="src/challenge.js"></script>
+    <script src="src/gambling.js"></script>
+    <script src="src/pets.js"></script>
+    <script src="src/curses.js"></script>
+    <script src="src/biomes.js"></script>
+    <script src="src/synergy.js"></script>
+    <script src="src/vfx.js"></script>
+    <script src="src/ascension.js"></script>
+    <script src="src/luckwheel.js"></script>
+    <script src="src/floormod.js"></script>
+    <script src="src/game.js"></script>
+</body>
+</html>

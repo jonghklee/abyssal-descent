@@ -1,0 +1,44 @@
+{
+  "name": "abyssal-descent",
+  "version": "0.1.0",
+  "description": "A roguelike dungeon crawler with procedural generation, real-time combat, and deep progression systems",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "npx http-server . -p 8080 -o",
+    "build:mac": "electron-builder --mac",
+    "build:win": "electron-builder --win",
+    "build:linux": "electron-builder --linux",
+    "build:all": "electron-builder --mac --win --linux"
+  },
+  "build": {
+    "appId": "com.abyssaldescent.game",
+    "productName": "Abyssal Descent",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "index.html",
+      "main.js",
+      "src/**/*",
+      "assets/**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.games",
+      "target": ["dmg", "zip"]
+    },
+    "win": {
+      "target": ["nsis", "portable"]
+    },
+    "linux": {
+      "target": ["AppImage", "deb"]
+    }
+  },
+  "keywords": ["roguelike", "dungeon-crawler", "game", "pixel-art"],
+  "author": "Abyssal Descent Team",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.0.0"
+  }
+}

@@ -1,0 +1,583 @@
+// ============================================
+// COMBAT - Weapons & Attack system
+// ============================================
+
+const WEAPON_TYPES = {
+    sword: {
+        name: 'Iron Sword',
+        damage: 10,
+        range: 40,
+        arc: Math.PI * 0.6,
+        cooldown: 0.35,
+        knockback: 300,
+        type: 'melee',
+        color: '#b0bec5',
+        swingSpeed: 8,
+    },
+    axe: {
+        name: 'Battle Axe',
+        damage: 18,
+        range: 35,
+        arc: Math.PI * 0.8,
+        cooldown: 0.6,
+        knockback: 500,
+        type: 'melee',
+        color: '#8d6e63',
+        swingSpeed: 6,
+    },
+    dagger: {
+        name: 'Shadow Dagger',
+        damage: 6,
+        range: 25,
+        arc: Math.PI * 0.3,
+        cooldown: 0.15,
+        knockback: 150,
+        type: 'melee',
+        color: '#78909c',
+        swingSpeed: 15,
+    },
+    spear: {
+        name: 'Long Spear',
+        damage: 12,
+        range: 60,
+        arc: Math.PI * 0.25,
+        cooldown: 0.45,
+        knockback: 250,
+        type: 'melee',
+        color: '#a1887f',
+        swingSpeed: 10,
+    },
+    staff: {
+        name: 'Fire Staff',
+        damage: 14,
+        range: 250,
+        arc: 0,
+        cooldown: 0.5,
+        knockback: 100,
+        type: 'ranged',
+        color: '#ff6d00',
+        projectileSpeed: 350,
+        projectileSize: 5,
+        projectileColor: '#ff6d00',
+    },
+    bow: {
+        name: 'Hunter\'s Bow',
+        damage: 11,
+        range: 300,
+        arc: 0,
+        cooldown: 0.4,
+        knockback: 200,
+        type: 'ranged',
+        color: '#795548',
+        projectileSpeed: 450,
+        projectileSize: 3,
+        projectileColor: '#ffd740',
+    },
+};
+
+class Weapon {
+    constructor(type, rarity = 'common') {
+        const def = WEAPON_TYPES[type];
+        this.type = type;
+        this.weaponType = def.type;
+        this.name = def.name;
+        this.baseDamage = def.damage;
+        this.range = def.range;
+        this.arc = def.arc;
+        this.cooldown = def.cooldown;
+        this.knockback = def.knockback;
+        this.color = def.color;
+        this.swingSpeed = def.swingSpeed || 8;
+        this.projectileSpeed = def.projectileSpeed;
+        this.projectileSize = def.projectileSize;
+        this.projectileColor = def.projectileColor;
+
+        // Rarity multipliers
+        this.rarity = rarity;
+        const rarityMult = { common: 1, uncommon: 1.3, rare: 1.6, epic: 2.0, legendary: 2.8 };
+        this.damageMultiplier = rarityMult[rarity] || 1;
+        this.damage = Math.floor(this.baseDamage * this.damageMultiplier);
+
+        // Visual
+        this.swingAngle = 0;
+        this.isSwinging = false;
+        this.swingTimer = 0;
+        this.swingDirection = 1;
+
+        // Special effects
+        this.effects = [];
+        this.applyRarityEffects();
+    }
+
+    applyRarityEffects() {
+        if (this.rarity === 'rare') {
+            this.effects.push(Utils.randChoice(['fire', 'ice', 'poison']));
+        } else if (this.rarity === 'epic') {
+            this.effects.push(Utils.randChoice(['fire', 'ice', 'poison']));
+            this.effects.push(Utils.randChoice(['lifesteal', 'critBoost']));
+        } else if (this.rarity === 'legendary') {
+            this.effects.push('fire');
+            this.effects.push('lifesteal');
+            this.effects.push('critBoost');
+        }
+    }
+
+    getDamage(playerAttack, isCrit) {
+        let dmg = this.damage + playerAttack;
+        if (isCrit) dmg *= 2;
+        return Math.floor(dmg);
+    }
+
+    getRarityColor() {
+        const colors = {
+            common: '#9e9e9e',
+            uncommon: '#4caf50',
+            rare: '#2196f3',
+            epic: '#9c27b0',
+            legendary: '#ff9800',
+        };
+        return colors[this.rarity] || '#9e9e9e';
+    }
+
+    getDisplayName() {
+        const prefixes = {
+            uncommon: 'Fine',
+            rare: 'Superior',
+            epic: 'Mythic',
+            legendary: 'Legendary',
+        };
+        const prefix = prefixes[this.rarity];
+        return prefix ? `${prefix} ${this.name}` : this.name;
+    }
+}
+
+class CombatSystem {
+    constructor() {
+        this.playerProjectiles = [];
+        this.damageNumbers = [];
+        this.swingVisuals = [];
+    }
+
+    attack(player, enemies, input, dungeon) {
+        if (player.attackCooldown > 0) return;
+        if (player.weapons.length === 0) return;
+
+        const weapon = player.weapons[player.currentWeapon];
+        player.attackCooldown = weapon.cooldown;
+
+        if (weapon.weaponType === 'melee') {
+            this.meleeAttack(player, weapon, enemies, input);
+        } else {
+            this.rangedAttack(player, weapon, input, dungeon);
+        }
+
+        GameAudio.play('attack');
+    }
+
+    meleeAttack(player, weapon, enemies, input) {
+        const angle = player.facing;
+
+        // Swing visual
+        weapon.isSwinging = true;
+        weapon.swingTimer = 0;
+        weapon.swingDirection *= -1;
+
+        // Check hits
+        let hitCount = 0;
+        for (const enemy of enemies) {
+            if (!enemy.alive) continue;
+
+            const dist = Utils.dist(player.x, player.y, enemy.x, enemy.y);
+            if (dist > weapon.range + enemy.w / 2) continue;
+
+            const angleToEnemy = Utils.angle(player.x, player.y, enemy.x, enemy.y);
+            let angleDiff = angleToEnemy - angle;
+            while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
+            while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
+
+            if (Math.abs(angleDiff) < weapon.arc / 2) {
+                const isCrit = Math.random() < player.critChance;
+                let dmg = weapon.getDamage(player.attack, isCrit);
+                dmg = Math.max(1, dmg);
+
+                // Combo multiplier
+                dmg = Math.floor(dmg * player.getComboMultiplier());
+
+                const didDamage = enemy.takeDamage(dmg, player.x, player.y);
+                if (didDamage) {
+                    hitCount++;
+                    player.addCombo();
+
+                    // Damage number
+                    this.addDamageNumber(enemy.x, enemy.y - enemy.h / 2, dmg, isCrit);
+
+                    // Effects
+                    const hitAngle = Utils.angle(player.x, player.y, enemy.x, enemy.y);
+                    particles.bloodSplatter(enemy.x, enemy.y, hitAngle, 10);
+                    particles.hitSpark(enemy.x, enemy.y,
+                        isCrit ? '#ffeb3b' : weapon.color, isCrit ? 15 : 8);
+
+                    Utils.addShake(isCrit ? 6 : 3);
+                    if (isCrit) {
+                        Utils.addFreeze(3);
+                        Utils.addFlash('#ffeb3b', 0.15);
+                        // Screen slash VFX on high-damage crits
+                        if (typeof game !== 'undefined' && game.vfx && dmg > 30) {
+                            game.vfx.critSlash(Utils.angle(player.x, player.y, enemy.x, enemy.y));
+                        }
+                    }
+
+                    // Weapon effects
+                    if (weapon.effects.includes('fire')) {
+                        particles.explosion(enemy.x, enemy.y, '#ff6600', 8);
+                        enemy.takeDamage(Math.floor(dmg * 0.2), player.x, player.y);
+                    }
+                    if (weapon.effects.includes('ice')) {
+                        enemy.speed *= 0.5;
+                        setTimeout(() => { if (enemy.alive) enemy.speed *= 2; }, 2000);
+                    }
+                    if (weapon.effects.includes('lifesteal') || player.lifesteal > 0) {
+                        const stealPct = (weapon.effects.includes('lifesteal') ? 0.1 : 0) + player.lifesteal;
+                        const heal = Math.floor(dmg * stealPct);
+                        if (heal > 0) {
+                            player.hp = Math.min(player.hp + heal, player.maxHp);
+                            particles.trailEffect(player.x, player.y, '#66bb6a');
+                        }
+                    }
+
+                    // Check death
+                    if (!enemy.alive) {
+                        this.onEnemyDeath(enemy, player);
+                    }
+
+                    GameAudio.play('hit');
+                }
+            }
+        }
+
+        // Hit goblins too
+        if (typeof game !== 'undefined' && game.goblinManager) {
+            const dmg = weapon.getDamage(player.attack, false);
+            game.goblinManager.checkHits(player.x, player.y, weapon.range, dmg);
+        }
+
+        // Swing arc visual
+        this.swingVisuals.push({
+            x: player.x, y: player.y,
+            angle: angle,
+            range: weapon.range,
+            arc: weapon.arc,
+            color: weapon.getRarityColor(),
+            life: 0.15,
+            maxLife: 0.15,
+        });
+    }
+
+    rangedAttack(player, weapon, input, dungeon) {
+        const angle = player.facing;
+
+        this.playerProjectiles.push({
+            x: player.x + Math.cos(angle) * 15,
+            y: player.y + Math.sin(angle) * 15,
+            vx: Math.cos(angle) * weapon.projectileSpeed,
+            vy: Math.sin(angle) * weapon.projectileSpeed,
+            damage: weapon.getDamage(player.attack, false),
+            weapon: weapon,
+            player: player,
+            size: weapon.projectileSize,
+            color: weapon.projectileColor,
+            life: 2,
+            piercing: weapon.rarity === 'legendary',
+        });
+    }
+
+    update(dt, player, enemies, dungeon) {
+        // Update player projectiles
+        for (let i = this.playerProjectiles.length - 1; i >= 0; i--) {
+            const p = this.playerProjectiles[i];
+            p.x += p.vx * dt;
+            p.y += p.vy * dt;
+            p.life -= dt;
+
+            particles.trailEffect(p.x, p.y, p.color);
+
+            // Check enemy collision
+            let hitEnemy = false;
+            for (const enemy of enemies) {
+                if (!enemy.alive) continue;
+                if (circleCollide(p.x, p.y, p.size, enemy.x, enemy.y, enemy.w / 2)) {
+                    const isCrit = Math.random() < p.player.critChance;
+                    let dmg = p.damage;
+                    if (isCrit) dmg *= p.player.critMultiplier;
+                    dmg = Math.floor(dmg * p.player.getComboMultiplier());
+
+                    enemy.takeDamage(dmg, p.x, p.y);
+                    p.player.addCombo();
+                    this.addDamageNumber(enemy.x, enemy.y - enemy.h / 2, dmg, isCrit);
+                    particles.hitSpark(p.x, p.y, p.color);
+                    Utils.addShake(2);
+
+                    if (!enemy.alive) {
+                        this.onEnemyDeath(enemy, p.player);
+                    }
+
+                    GameAudio.play('hit');
+                    if (!p.piercing) {
+                        hitEnemy = true;
+                        break;
+                    }
+                }
+            }
+
+            if (hitEnemy) {
+                this.playerProjectiles.splice(i, 1);
+                continue;
+            }
+
+            // Wall collision
+            const tx = Math.floor(p.x / TILE_SIZE);
+            const ty = Math.floor(p.y / TILE_SIZE);
+            if (tx < 0 || tx >= dungeon.width || ty < 0 || ty >= dungeon.height ||
+                dungeon.tiles[ty][tx] === TILE.WALL || dungeon.tiles[ty][tx] === TILE.VOID) {
+                particles.hitSpark(p.x, p.y, p.color, 5);
+                this.playerProjectiles.splice(i, 1);
+                continue;
+            }
+
+            if (p.life <= 0) {
+                this.playerProjectiles.splice(i, 1);
+            }
+        }
+
+        // Update swing visuals
+        for (let i = this.swingVisuals.length - 1; i >= 0; i--) {
+            this.swingVisuals[i].life -= dt;
+            if (this.swingVisuals[i].life <= 0) {
+                this.swingVisuals.splice(i, 1);
+            }
+        }
+
+        // Update damage numbers
+        for (let i = this.damageNumbers.length - 1; i >= 0; i--) {
+            const dn = this.damageNumbers[i];
+            dn.y += dn.vy * dt * 60;
+            dn.vy -= 0.05;
+            dn.life -= dt;
+            if (dn.life <= 0) {
+                this.damageNumbers.splice(i, 1);
+            }
+        }
+
+        // Update weapon swing animation
+        if (player.weapons.length > 0) {
+            const weapon = player.weapons[player.currentWeapon];
+            if (weapon.isSwinging) {
+                weapon.swingTimer += dt;
+                weapon.swingAngle = Math.sin(weapon.swingTimer * weapon.swingSpeed * Math.PI) *
+                    weapon.arc / 2 * weapon.swingDirection;
+                if (weapon.swingTimer > 1 / weapon.swingSpeed) {
+                    weapon.isSwinging = false;
+                    weapon.swingAngle = 0;
+                }
+            }
+        }
+    }
+
+    onEnemyDeath(enemy, player) {
+        player.gainXP(enemy.xpReward);
+        player.gold += enemy.goldReward;
+        player.kills++;
+
+        particles.explosion(enemy.x, enemy.y,
+            enemy.isBoss ? '#ff1744' : '#ff6600',
+            enemy.isBoss ? 60 : 25);
+
+        Utils.addShake(enemy.isBoss ? 15 : 5);
+        Utils.addFreeze(enemy.isBoss ? 10 : 2);
+
+        if (enemy.isBoss) {
+            Utils.addSlowMo(0.2, 1.0);
+            Utils.addFlash('#ff1744', 0.5);
+            // Boss kill screen crack
+            if (typeof game !== 'undefined' && game.vfx) {
+                game.vfx.screenCrack();
+            }
+        } else if (enemy.isElite) {
+            // Elite kill = satisfying
+            Utils.addSlowMo(0.3, 0.3);
+            Utils.addFlash('#ffd740', 0.2);
+            if (typeof game !== 'undefined' && game.vfx) {
+                game.vfx.critSlash(Utils.angle(player.x, player.y, enemy.x, enemy.y));
+            }
+        } else {
+            Utils.addSlowMo(0.6, 0.1);
+        }
+
+        // Multi-kill bonus feel
+        if (player.combo >= 10) {
+            Utils.addFlash('#ffeb3b', 0.15);
+            if (typeof game !== 'undefined' && game.vfx && player.combo % 10 === 0) {
+                game.vfx.comboExplosion();
+            }
+        } else if (player.combo >= 5) {
+            Utils.addFlash('#ffeb3b', 0.08);
+        }
+
+        GameAudio.play(enemy.isBoss ? 'bossDeath' : 'enemyDeath');
+    }
+
+    addDamageNumber(x, y, damage, isCrit) {
+        this.damageNumbers.push({
+            x: x + Utils.rand(-10, 10),
+            y: y,
+            text: damage.toString(),
+            color: isCrit ? '#ffeb3b' : '#ff5252',
+            size: isCrit ? 18 : 14,
+            life: 1.0,
+            vy: -2,
+            isCrit,
+        });
+    }
+
+    draw(ctx) {
+        // Swing visuals
+        for (const sv of this.swingVisuals) {
+            const alpha = sv.life / sv.maxLife;
+            ctx.save();
+            ctx.translate(sv.x, sv.y);
+            ctx.rotate(sv.angle - sv.arc / 2);
+            ctx.fillStyle = sv.color;
+            ctx.globalAlpha = alpha * 0.3;
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.arc(0, 0, sv.range, 0, sv.arc);
+            ctx.closePath();
+            ctx.fill();
+
+            // Arc outline
+            ctx.strokeStyle = sv.color;
+            ctx.globalAlpha = alpha * 0.8;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(0, 0, sv.range, 0, sv.arc);
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        // Player projectiles
+        for (const p of this.playerProjectiles) {
+            ctx.save();
+            ctx.shadowBlur = 12;
+            ctx.shadowColor = p.color;
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#fff';
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size * 0.4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
+
+        // Damage numbers
+        for (const dn of this.damageNumbers) {
+            const alpha = dn.life;
+            const scale = dn.isCrit ? 1.2 + (1 - dn.life) * 0.3 : 1;
+            ctx.save();
+            ctx.translate(dn.x, dn.y);
+            ctx.scale(scale, scale);
+            ctx.globalAlpha = alpha;
+            ctx.font = `bold ${dn.size}px monospace`;
+            ctx.textAlign = 'center';
+
+            // Shadow
+            ctx.fillStyle = '#000';
+            ctx.fillText(dn.text, 1, 1);
+
+            // Text
+            ctx.fillStyle = dn.color;
+            ctx.fillText(dn.text, 0, 0);
+
+            if (dn.isCrit) {
+                ctx.fillStyle = '#fff';
+                ctx.font = `bold 8px monospace`;
+                ctx.fillText('CRIT!', 0, -12);
+            }
+            ctx.restore();
+        }
+    }
+
+    drawWeapon(ctx, player) {
+        if (player.weapons.length === 0) return;
+        const weapon = player.weapons[player.currentWeapon];
+
+        ctx.save();
+        ctx.translate(player.x, player.y);
+        ctx.rotate(player.facing + weapon.swingAngle);
+
+        if (weapon.weaponType === 'melee') {
+            // Weapon handle
+            ctx.fillStyle = '#5d4037';
+            ctx.fillRect(8, -2, 8, 4);
+
+            // Weapon blade
+            ctx.fillStyle = weapon.getRarityColor();
+            ctx.shadowBlur = weapon.isSwinging ? 8 : 0;
+            ctx.shadowColor = weapon.getRarityColor();
+
+            switch (weapon.type) {
+                case 'sword':
+                    ctx.fillRect(16, -3, 22, 6);
+                    ctx.fillRect(36, -2, 4, 4);
+                    break;
+                case 'axe':
+                    ctx.fillRect(14, -2, 10, 4);
+                    ctx.beginPath();
+                    ctx.moveTo(24, -10);
+                    ctx.lineTo(34, 0);
+                    ctx.lineTo(24, 10);
+                    ctx.fill();
+                    break;
+                case 'dagger':
+                    ctx.fillRect(14, -2, 14, 4);
+                    ctx.fillRect(26, -1, 4, 2);
+                    break;
+                case 'spear':
+                    ctx.fillRect(12, -1.5, 35, 3);
+                    ctx.beginPath();
+                    ctx.moveTo(47, -5);
+                    ctx.lineTo(55, 0);
+                    ctx.lineTo(47, 5);
+                    ctx.fill();
+                    break;
+            }
+        } else {
+            // Ranged weapon
+            ctx.fillStyle = weapon.color;
+            if (weapon.type === 'staff') {
+                ctx.fillRect(8, -2, 30, 4);
+                ctx.fillStyle = weapon.projectileColor;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = weapon.projectileColor;
+                ctx.beginPath();
+                ctx.arc(40, 0, 5, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (weapon.type === 'bow') {
+                ctx.strokeStyle = weapon.color;
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(20, 0, 15, -Math.PI / 3, Math.PI / 3);
+                ctx.stroke();
+                ctx.strokeStyle = '#bcaaa4';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(20 + Math.cos(-Math.PI / 3) * 15, Math.sin(-Math.PI / 3) * 15);
+                ctx.lineTo(20 + Math.cos(Math.PI / 3) * 15, Math.sin(Math.PI / 3) * 15);
+                ctx.stroke();
+            }
+        }
+
+        ctx.restore();
+    }
+}
