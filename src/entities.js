@@ -176,7 +176,12 @@ class Player extends Entity {
 
     update(dt, dungeon, input) {
         // Dash
+        const wasCooling = this.dashCooldown > 0;
         if (this.dashCooldown > 0) this.dashCooldown -= dt;
+        // Dash ready notification (subtle sound)
+        if (wasCooling && this.dashCooldown <= 0) {
+            GameAudio.play('xp'); // Reuse quiet sound
+        }
         if (this.attackCooldown > 0) this.attackCooldown -= dt;
         if (this.comboTimer > 0) {
             this.comboTimer -= dt;

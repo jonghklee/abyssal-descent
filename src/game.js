@@ -1836,7 +1836,13 @@ class Game {
 
             ctx.fillStyle = '#78909c';
             ctx.font = '16px monospace';
-            ctx.fillText('You have conquered the Abyss!', w / 2, h * 0.22);
+            const endings = {
+                'Warrior': 'The Warrior stands victorious, axe dripping with darkness.',
+                'Rogue': 'The Rogue vanishes into shadow, pockets overflowing.',
+                'Mage': 'The Mage seals the rift with arcane mastery.',
+                'Necromancer': 'The Necromancer claims the abyss as their domain.',
+            };
+            ctx.fillText(endings[this.player.className] || 'You have conquered the Abyss!', w / 2, h * 0.22);
 
             // Stats
             const p = this.player;
