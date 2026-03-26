@@ -140,6 +140,12 @@ class Game {
                 this.ui.minimap = !this.ui.minimap;
             }
 
+            // Stats overlay (Tab)
+            if (e.code === 'Tab' && this.state === 'playing') {
+                this.showStats = !this.showStats;
+                e.preventDefault();
+            }
+
             // Pause (Escape during gameplay)
             if (e.code === 'Escape' && (this.state === 'playing' || this.state === 'paused')) {
                 if (this.codex && this.codex.showScreen) {
@@ -1486,6 +1492,53 @@ class Game {
 
         // ---- Synergy notification ----
         if (this.synergySystem) this.synergySystem.draw(ctx, w, h);
+
+        // ---- Stats overlay (Tab) ----
+        if (this.showStats && this.state === 'playing') {
+            const p = this.player;
+            ctx.fillStyle = 'rgba(0,0,0,0.75)';
+            ctx.fillRect(15, 100, 220, 280);
+            ctx.strokeStyle = '#455a64';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(15, 100, 220, 280);
+
+            ctx.textAlign = 'left';
+            ctx.fillStyle = '#64ffda';
+            ctx.font = 'bold 12px monospace';
+            ctx.fillText(`${p.classIcon || ''} ${p.className || 'Adventurer'} Stats`, 25, 118);
+
+            const stats = [
+                ['HP', `${p.hp}/${p.maxHp}`, '#4caf50'],
+                ['Attack', p.attack, '#ff5252'],
+                ['Defense', p.defense, '#78909c'],
+                ['Speed', Math.floor(p.speed), '#4fc3f7'],
+                ['Crit %', Math.floor(p.critChance * 100) + '%', '#ffeb3b'],
+                ['Crit DMG', p.critMultiplier.toFixed(1) + 'x', '#ff9800'],
+                ['Lifesteal', Math.floor(p.lifesteal * 100) + '%', '#e91e63'],
+                ['Kills', p.kills, '#ff5252'],
+                ['Gold', Math.floor(p.gold), '#ffd740'],
+                ['Level', p.level, '#64ffda'],
+                ['Potions', p.potions, '#66bb6a'],
+                ['Combo', `${p.combo} (best: ${p.maxCombo})`, '#ff4081'],
+                ['Relics', p.relics ? p.relics.length : 0, '#b388ff'],
+                ['Weapons', p.weapons.length, '#78909c'],
+            ];
+
+            for (let i = 0; i < stats.length; i++) {
+                const [label, val, color] = stats[i];
+                ctx.fillStyle = '#546e7a';
+                ctx.font = '10px monospace';
+                ctx.fillText(label, 25, 138 + i * 17);
+                ctx.fillStyle = color;
+                ctx.textAlign = 'right';
+                ctx.fillText(String(val), 225, 138 + i * 17);
+                ctx.textAlign = 'left';
+            }
+
+            ctx.fillStyle = '#37474f';
+            ctx.font = '8px monospace';
+            ctx.fillText('[TAB] close', 25, 375);
+        }
 
         // ---- Pause screen ----
         if (this.state === 'paused') {

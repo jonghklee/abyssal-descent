@@ -201,7 +201,9 @@ class GameUI {
 
             ctx.fillStyle = '#78909c';
             ctx.font = '10px monospace';
-            ctx.fillText(`DMG: ${weapon.damage + player.attack}  |  [E] Switch  |  [Click] Attack`, wbX, wbY + 18);
+            const totalDmg = weapon.damage + player.attack;
+            const dps = (totalDmg / weapon.cooldown).toFixed(0);
+            ctx.fillText(`DMG:${totalDmg} DPS:${dps}  |  [E] Switch  |  [Click] Attack`, wbX, wbY + 18);
         }
 
         // ---- Combo counter ----
