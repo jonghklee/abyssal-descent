@@ -562,7 +562,9 @@ class GameUI {
                 if (meta.classesPlayed) {
                     const classes = Object.keys(meta.classesPlayed);
                     ctx.fillStyle = '#2e3440';
-                    ctx.fillText(`Classes: ${classes.join(', ')}`, w / 2, menuY + 116);
+                    const cv = meta.classVictories || {};
+                    const classInfo = classes.map(c => cv[c] ? `${c}(${cv[c]}W)` : c).join(', ');
+                    ctx.fillText(`Classes: ${classInfo}`, w / 2, menuY + 116);
                 }
 
                 // Codex progress

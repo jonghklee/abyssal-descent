@@ -1565,6 +1565,10 @@ class Game {
             // Track victory
             if (!this.meta.data.victories) this.meta.data.victories = 0;
             this.meta.data.victories++;
+            // Track victories per class
+            if (!this.meta.data.classVictories) this.meta.data.classVictories = {};
+            const cn = this.player.className;
+            this.meta.data.classVictories[cn] = (this.meta.data.classVictories[cn] || 0) + 1;
             // Earn bonus souls
             const victorySouls = this.meta.endRun(this.player, this.floor, this);
             this.soulsEarned = victorySouls * 2; // Double souls for winning!
