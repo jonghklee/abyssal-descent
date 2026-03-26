@@ -232,9 +232,11 @@ class GameUI {
             ctx.fillStyle = 'rgba(0,0,0,0.5)';
             ctx.fillRect(wbX - 100, wbY - 10, 200, 35);
 
+            const weaponIcons = { sword:'🗡', axe:'🪓', dagger:'🔪', spear:'🔱', staff:'🪄', bow:'🏹' };
+            const wIcon = weaponIcons[weapon.type] || '';
             ctx.fillStyle = weapon.getRarityColor();
             ctx.font = 'bold 12px monospace';
-            ctx.fillText(weapon.getDisplayName(), wbX, wbY + 4);
+            ctx.fillText(`${wIcon} ${weapon.getDisplayName()}`, wbX, wbY + 4);
 
             ctx.fillStyle = '#78909c';
             ctx.font = '10px monospace';
