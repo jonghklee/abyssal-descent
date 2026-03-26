@@ -1155,6 +1155,14 @@ class Game {
         if (currentRoom && currentRoom !== this.lastRoom && !anyOverlayActive) {
             this.lastRoom = currentRoom;
 
+            // Show enemy count in new room
+            const roomEnemyCount = this.enemies.filter(e => e.alive && !e.isAlly &&
+                currentRoom.contains(Math.floor(e.x / TILE_SIZE), Math.floor(e.y / TILE_SIZE))
+            ).length;
+            if (roomEnemyCount > 0 && !currentRoom.cleared) {
+                this.ui.notify(`${roomEnemyCount} enemies`, '#546e7a', 1.5);
+            }
+
             // Chaos Dice relic: random ATK bonus each room
             if (this.player.chaosDice) {
                 // Remove old bonus, add new

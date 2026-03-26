@@ -526,7 +526,10 @@ class GameUI {
                 // Codex progress
                 if (typeof game.codex !== 'undefined') {
                     ctx.fillStyle = '#2e3440';
-                    ctx.fillText(`Codex: ${game.codex.getCompletionPercent()}%`, w / 2, menuY + 132);
+                    const totalTime = meta.totalPlayTime || 0;
+                    const hours = Math.floor(totalTime / 3600);
+                    const mins = Math.floor((totalTime % 3600) / 60);
+                    ctx.fillText(`Codex: ${game.codex.getCompletionPercent()}% | Play Time: ${hours}h ${mins}m`, w / 2, menuY + 132);
                 }
             }
             if (typeof game.ascension !== 'undefined' && game.ascension.level > 0) {

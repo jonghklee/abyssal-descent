@@ -216,7 +216,10 @@ class MetaProgression {
         this.data.bestFloor = Math.max(this.data.bestFloor, floor);
         this.data.bestKills = Math.max(this.data.bestKills, player.kills);
         this.data.totalKills += player.kills;
-        this.data.totalGold += player.gold;
+        this.data.totalGold += Math.floor(player.gold);
+        // Track total play time
+        if (!this.data.totalPlayTime) this.data.totalPlayTime = 0;
+        if (game && game.playTime) this.data.totalPlayTime += Math.floor(game.playTime);
 
         // Earn souls based on performance
         const floorSouls = floor * 5;
