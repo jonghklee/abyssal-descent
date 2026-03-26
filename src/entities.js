@@ -304,6 +304,14 @@ class Player extends Entity {
         GameAudio.play('levelUp');
         Utils.addShake(8);
         Utils.addFlash('#64ffda', 0.3);
+        // Floating level up text
+        if (typeof game !== 'undefined' && game.combat) {
+            game.combat.damageNumbers.push({
+                x: this.x, y: this.y - 30,
+                text: `LEVEL ${this.level}!`, color: '#64ffda',
+                size: 20, life: 1.5, vy: -1.5, isCrit: true,
+            });
+        }
     }
 
     addCombo() {
