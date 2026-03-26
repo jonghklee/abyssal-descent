@@ -531,6 +531,18 @@ class Game {
     update(dt) {
         this.ui.update(dt);
 
+        if (this.state === 'victory') {
+            this.ui.victoryTimer = (this.ui.victoryTimer || 0) + dt;
+            if (this.input.keys['Digit1'] && this.ui.victoryTimer > 2) {
+                // Continue to endless mode
+                this.state = 'playing';
+                this.generateFloor();
+                this.ui.notify('♾ ENDLESS MODE — How deep can you go?', '#ffd740', 5);
+            } else if (this.input.keys['Digit2'] && this.ui.victoryTimer > 2) {
+                this.state = 'soulforge';
+            }
+            return;
+        }
         if (this.state !== 'playing') return;
 
         // Class selection pauses game
@@ -1363,6 +1375,19 @@ class Game {
         this.floor++;
         GameAudio.play('stairs');
 
+        // Victory at floor 20!
+        if (this.floor === 21 && !this._victoryShown) {
+            this._victoryShown = true;
+            this.state = 'victory';
+            this.ui.victoryTimer = 0;
+            // Earn bonus souls
+            const victorySouls = this.meta.endRun(this.player, this.floor, this);
+            this.soulsEarned = victorySouls * 2; // Double souls for winning!
+            this.meta.data.souls += victorySouls; // Extra bonus
+            this.meta.save();
+            return;
+        }
+
         // King's Crown relic: +ATK per floor
         if (this.player.atkPerFloor) {
             this.player.attack += this.player.atkPerFloor;
@@ -1693,6 +1718,65 @@ class Game {
             ctx.fillStyle = '#37474f';
             ctx.font = '8px monospace';
             ctx.fillText('[TAB] close', 25, 375);
+        }
+
+        // ---- Victory screen ----
+        if (this.state === 'victory') {
+            ctx.fillStyle = 'rgba(0,0,10,0.9)';
+            ctx.fillRect(0, 0, w, h);
+            ctx.textAlign = 'center';
+
+            // Title
+            ctx.fillStyle = '#ffd740';
+            ctx.font = 'bold 48px monospace';
+            ctx.shadowBlur = 25;
+            ctx.shadowColor = '#ffd740';
+            ctx.fillText('VICTORY!', w / 2, h * 0.15);
+            ctx.shadowBlur = 0;
+
+            ctx.fillStyle = '#78909c';
+            ctx.font = '16px monospace';
+            ctx.fillText('You have conquered the Abyss!', w / 2, h * 0.22);
+
+            // Stats
+            const p = this.player;
+            const sy = h * 0.30;
+            ctx.font = '13px monospace';
+            const stats = [
+                [`${p.classIcon || ''} ${p.className || 'Hero'}`, '', '#e0e0e0'],
+                ['Level', p.level, '#64ffda'],
+                ['Kills', p.kills, '#ff5252'],
+                ['Gold', Math.floor(p.gold), '#ffd740'],
+                ['Best Combo', p.maxCombo, '#ff4081'],
+                ['Relics', p.relics ? p.relics.length : 0, '#b388ff'],
+                ['Pets', this.petSystem ? this.petSystem.collection.length : 0, '#e91e63'],
+            ];
+            for (let i = 0; i < stats.length; i++) {
+                ctx.fillStyle = '#546e7a';
+                ctx.textAlign = 'left';
+                ctx.fillText(stats[i][0], w / 2 - 100, sy + i * 22);
+                ctx.fillStyle = stats[i][2];
+                ctx.textAlign = 'right';
+                ctx.fillText(String(stats[i][1]), w / 2 + 100, sy + i * 22);
+            }
+
+            // Souls
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#b388ff';
+            ctx.font = 'bold 18px monospace';
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = '#b388ff';
+            ctx.fillText(`+${this.soulsEarned || 0} Souls (2x Victory Bonus!)`, w / 2, h * 0.68);
+            ctx.shadowBlur = 0;
+
+            // Options
+            if ((this.ui.victoryTimer || 0) > 2) {
+                ctx.font = 'bold 14px monospace';
+                ctx.fillStyle = '#ffd740';
+                ctx.fillText('[ 1 ] Continue to Endless Mode', w / 2, h * 0.78);
+                ctx.fillStyle = '#b388ff';
+                ctx.fillText('[ 2 ] Soul Forge', w / 2, h * 0.83);
+            }
         }
 
         // ---- Pause screen ----
