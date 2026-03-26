@@ -745,17 +745,23 @@ class GameUI {
             ctx.fillText(`Effects: ${weapon.effects.join(', ')}`, cx, cy + 20);
         }
 
-        // Compare with current
+        // Compare with current (DPS comparison)
         if (currentWeapon) {
-            ctx.fillStyle = '#546e7a';
-            ctx.font = '10px monospace';
+            const newDPS = Math.floor(weapon.damage / weapon.cooldown);
+            const curDPS = Math.floor(currentWeapon.damage / currentWeapon.cooldown);
+            const dpsDiff = newDPS - curDPS;
             const dmgDiff = weapon.damage - currentWeapon.damage;
-            const dmgColor = dmgDiff > 0 ? '#4caf50' : dmgDiff < 0 ? '#f44336' : '#78909c';
-            ctx.fillStyle = dmgColor;
+
+            ctx.font = '10px monospace';
+            const betterDPS = dpsDiff > 0;
+            ctx.fillStyle = betterDPS ? '#4caf50' : dpsDiff < 0 ? '#f44336' : '#78909c';
             ctx.fillText(
-                `vs current: ${dmgDiff > 0 ? '+' : ''}${dmgDiff} damage`,
+                `vs ${currentWeapon.getDisplayName()}: ${dmgDiff >= 0 ? '+' : ''}${dmgDiff} DMG, ${dpsDiff >= 0 ? '+' : ''}${dpsDiff} DPS`,
                 cx, cy + 45
             );
+            ctx.fillStyle = betterDPS ? '#4caf50' : '#f44336';
+            ctx.font = 'bold 10px monospace';
+            ctx.fillText(betterDPS ? '⬆ UPGRADE' : '⬇ DOWNGRADE', cx, cy + 60);
         }
 
         // Actions
