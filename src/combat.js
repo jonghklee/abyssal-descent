@@ -500,12 +500,24 @@ class CombatSystem {
             }
         }
 
-        // First kill celebration
+        // First kill celebration — hook new players immediately
         if (typeof game !== 'undefined' && !game.firstKillDone && player.kills === 1) {
             game.firstKillDone = true;
-            Utils.addSlowMo(0.2, 0.8);
-            Utils.addFreeze(6);
+            Utils.addSlowMo(0.15, 1.0);
+            Utils.addFreeze(8);
+            Utils.addFlash('#ff5252', 0.2);
             if (game.vfx) game.vfx.critSlash(Utils.angle(player.x, player.y, enemy.x, enemy.y));
+            // Big floating "FIRST BLOOD!" text
+            this.damageNumbers.push({
+                x: enemy.x, y: enemy.y - 30,
+                text: 'FIRST BLOOD!', color: '#ff5252',
+                size: 22, life: 2.0, vy: -1, isCrit: true,
+            });
+            // Bonus XP burst
+            for (let i = 0; i < 8; i++) {
+                game.items.items.push(new ItemDrop(enemy.x, enemy.y, 'xpOrb', { amount: 5 }));
+            }
+            GameAudio.play('levelUp');
         }
 
         // Golden enemy death celebration
