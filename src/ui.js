@@ -74,6 +74,17 @@ class GameUI {
         ctx.fillStyle = 'rgba(0,0,0,0.6)';
         ctx.fillRect(hpX - 2, hpY - 2, hpBarW + 4, hpBarH + 4);
 
+        // Trailing HP bar (shows recent damage)
+        if (!this._trailHp) this._trailHp = player.hp;
+        if (player.hp < this._trailHp) {
+            this._trailHp -= (this._trailHp - player.hp) * 0.05; // Slow catch up
+        } else {
+            this._trailHp = player.hp;
+        }
+        const trailPercent = this._trailHp / player.maxHp;
+        ctx.fillStyle = 'rgba(255,82,82,0.5)';
+        ctx.fillRect(hpX, hpY, hpBarW * trailPercent, hpBarH);
+
         // HP fill
         const hpPercent = player.hp / player.maxHp;
         const hpGradient = ctx.createLinearGradient(hpX, hpY, hpX + hpBarW * hpPercent, hpY);

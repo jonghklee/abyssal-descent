@@ -5,10 +5,10 @@
 const WEAPON_TYPES = {
     sword: {
         name: 'Iron Sword',
-        damage: 10,
-        range: 40,
+        damage: 10,        // Balanced: good DPS, medium range
+        range: 42,
         arc: Math.PI * 0.6,
-        cooldown: 0.35,
+        cooldown: 0.32,    // DPS: ~31
         knockback: 300,
         type: 'melee',
         color: '#b0bec5',
@@ -16,33 +16,34 @@ const WEAPON_TYPES = {
     },
     axe: {
         name: 'Battle Axe',
-        damage: 18,
-        range: 35,
-        arc: Math.PI * 0.8,
-        cooldown: 0.6,
-        knockback: 500,
+        damage: 20,         // Heavy hitter: high dmg, wide arc, slow
+        range: 38,
+        arc: Math.PI * 0.9,
+        cooldown: 0.55,     // DPS: ~36
+        knockback: 600,
         type: 'melee',
         color: '#8d6e63',
         swingSpeed: 6,
     },
     dagger: {
         name: 'Shadow Dagger',
-        damage: 6,
-        range: 25,
-        arc: Math.PI * 0.3,
-        cooldown: 0.15,
-        knockback: 150,
+        damage: 7,          // Speed demon: fast, crit bonus
+        range: 28,
+        arc: Math.PI * 0.35,
+        cooldown: 0.12,     // DPS: ~58 (highest raw DPS!)
+        knockback: 120,
         type: 'melee',
         color: '#78909c',
-        swingSpeed: 15,
+        swingSpeed: 18,
+        critBonus: 0.15,    // +15% crit chance with dagger
     },
     spear: {
         name: 'Long Spear',
-        damage: 12,
-        range: 60,
-        arc: Math.PI * 0.25,
-        cooldown: 0.45,
-        knockback: 250,
+        damage: 13,          // Long range poke: safe play
+        range: 65,
+        arc: Math.PI * 0.22,
+        cooldown: 0.40,      // DPS: ~33
+        knockback: 350,
         type: 'melee',
         color: '#a1887f',
         swingSpeed: 10,
@@ -196,7 +197,8 @@ class CombatSystem {
             while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
 
             if (Math.abs(angleDiff) < weapon.arc / 2) {
-                const isCrit = Math.random() < player.critChance;
+                const critBonus = weapon.critBonus || 0;
+                const isCrit = Math.random() < (player.critChance + critBonus);
                 let dmg = weapon.getDamage(player.attack, isCrit);
                 dmg = Math.max(1, dmg);
 
