@@ -140,6 +140,14 @@ class Game {
                 this.ui.minimap = !this.ui.minimap;
             }
 
+            // Codex (C)
+            if (e.code === 'KeyC' && this.state === 'playing') {
+                if (this.codex) {
+                    this.codex.showScreen = !this.codex.showScreen;
+                    if (this.codex.showScreen) return;
+                }
+            }
+
             // Weapon Forge (R)
             if (e.code === 'KeyR' && this.player && this.player.weapons.length >= 2 && this.state === 'playing') {
                 if (!this.forge.active) this.forge.open(this.player);
@@ -242,6 +250,7 @@ class Game {
         this.goblinManager = new GoblinManager();
         this.saveSystem = new SaveSystem();
         this.tutorial = new Tutorial();
+        this.codex = new Codex();
 
         // Apply meta-progression bonuses
         this.meta.applyToPlayer(this.player);
@@ -420,6 +429,7 @@ class Game {
         }
         this.ui.notify(`Equipped: ${weapon.getDisplayName()}`, weapon.getRarityColor());
         GameAudio.play('pickup');
+        if (this.codex) this.codex.trackWeapon(weapon);
     }
 
     // ---- Main loop ----
@@ -459,6 +469,23 @@ class Game {
         this.ui.update(dt);
 
         if (this.state !== 'playing') return;
+
+        // Codex screen pauses game
+        if (this.codex && this.codex.showScreen) {
+            if (this.input.keys['Escape']) {
+                this.codex.showScreen = false;
+                this.input.keys['Escape'] = false;
+            }
+            // Tab switching
+            for (let i = 0; i < 4; i++) {
+                if (this.input.keys[`Digit${i + 1}`]) {
+                    this.codex.tab = i;
+                    this.input.keys[`Digit${i + 1}`] = false;
+                }
+            }
+            return;
+        }
+
         if (this.weaponPickup) return; // Pause during weapon pickup
 
         // Lucky Wheel
@@ -687,10 +714,13 @@ class Game {
                         this.player.gold = Math.floor(this.player.gold + bonusGold);
                     }
 
-                    // Achievement tracking
+                    // Achievement & codex tracking
                     if (this.achievements) {
                         if (enemy.isElite) this.achievements.addStat('eliteKills');
                         if (enemy.isBoss) this.achievements.addStat('bossKills');
+                    }
+                    if (this.codex) {
+                        this.codex.trackEnemyKill(enemy);
                     }
 
                     // Elite enemies drop gacha on kill
@@ -1192,6 +1222,11 @@ class Game {
         // ---- Crosshair ----
         if (this.state === 'playing') {
             this.ui.drawCrosshair(ctx, this.input.mouse.x, this.input.mouse.y);
+        }
+
+        // ---- Codex ----
+        if (this.codex && this.codex.showScreen) {
+            this.codex.draw(ctx, w, h);
         }
 
         // ---- Lucky Wheel ----
