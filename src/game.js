@@ -1530,6 +1530,8 @@ class Game {
                         this.player.relics.push(relic);
                         if (this.codex) this.codex.trackRelic(relic);
                         this.ui.notify(`${relic.icon} BOSS DROP: ${relic.name}!`, '#ff9800', 4);
+                        // Immediate synergy check
+                        if (this.synergySystem) this.synergySystem.check(this.player);
                     }
 
                     setTimeout(() => {
