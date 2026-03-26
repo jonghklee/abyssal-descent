@@ -1495,6 +1495,14 @@ class Game {
                 if (room.type === 'miniboss') {
                     if (this.achievements) this.achievements.addStat('minibossKills');
                     this.ui.notify('⭐ Miniboss Defeated!', '#ff9800', 3);
+                    // Guaranteed pet drop from miniboss
+                    if (this.petSystem) {
+                        const rarity = Utils.randChoice(['uncommon', 'rare']);
+                        const petDef = this.petSystem.getRandomPet(rarity);
+                        const pet = this.petSystem.addPet(petDef);
+                        if (this.codex) this.codex.trackPet(pet);
+                        this.ui.notify(`🐾 New pet: ${pet.name}!`, pet.getRarityColor(), 3);
+                    }
                 }
                 if (room.type === 'boss') {
                     this.ui.notify('BOSS DEFEATED!', '#ff1744', 5);
