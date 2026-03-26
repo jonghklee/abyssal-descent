@@ -315,6 +315,10 @@ class Game {
         // Play timer
         this.playTime = 0;
         this.firstKillDone = false;
+        this._victoryShown = false;
+        this._bossSeenBefore = false;
+        this._perfectStreak = 0;
+        this._floorCleared = false;
 
         // Meta bonuses: applied after class selection (in classes.js)
         // For save/load (skipClassSelect), apply here
