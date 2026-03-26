@@ -91,8 +91,13 @@ class ClassSelect {
 
         // Apply class stats
         Object.assign(player, cls.stats);
-        player.hp = player.maxHp;
         player.potions = cls.potions;
+
+        // Re-apply meta-progression bonuses AFTER class stats
+        if (typeof game !== 'undefined' && game.meta) {
+            game.meta.applyToPlayer(player);
+        }
+        player.hp = player.maxHp;
 
         // Give class weapon
         // Use milestone unlocked rarity if better than class default

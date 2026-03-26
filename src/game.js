@@ -267,8 +267,11 @@ class Game {
         this.codex = new Codex();
         this.classSelect = new ClassSelect();
 
-        // Apply meta-progression bonuses
-        this.meta.applyToPlayer(this.player);
+        // Meta bonuses: applied after class selection (in classes.js)
+        // For save/load (skipClassSelect), apply here
+        if (skipClassSelect && this.meta) {
+            this.meta.applyToPlayer(this.player);
+        }
 
         // Give starter pet
         const starterPet = this.petSystem.getRandomPet('common');
