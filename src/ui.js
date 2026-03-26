@@ -319,6 +319,17 @@ class GameUI {
         if (!dungeon._explored) dungeon._explored = {};
         const ptx = Math.floor(player.x / TILE_SIZE);
         const pty = Math.floor(player.y / TILE_SIZE);
+
+        // Compass relic: reveal full map
+        if (player.fullMapReveal && !dungeon._fullRevealed) {
+            dungeon._fullRevealed = true;
+            for (let y = 0; y < dungeon.height; y++) {
+                for (let x = 0; x < dungeon.width; x++) {
+                    dungeon._explored[`${x},${y}`] = true;
+                }
+            }
+        }
+
         const revealRadius = 8;
         for (let dy = -revealRadius; dy <= revealRadius; dy++) {
             for (let dx = -revealRadius; dx <= revealRadius; dx++) {

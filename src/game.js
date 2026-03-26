@@ -1089,7 +1089,13 @@ class Game {
 
                 // Meta-progression: earn souls
                 if (this.meta) {
-                    const soulsEarned = this.meta.endRun(this.player, this.floor, this);
+                    let soulsEarned = this.meta.endRun(this.player, this.floor, this);
+                    // Soul Jar relic bonus
+                    if (this.player.soulBonus) {
+                        soulsEarned = Math.floor(soulsEarned * this.player.soulBonus);
+                        this.meta.data.souls += soulsEarned - Math.floor(soulsEarned / this.player.soulBonus);
+                        this.meta.save();
+                    }
                     this.soulsEarned = soulsEarned;
                 }
             }
@@ -1151,6 +1157,12 @@ class Game {
     descend() {
         this.floor++;
         GameAudio.play('stairs');
+
+        // King's Crown relic: +ATK per floor
+        if (this.player.atkPerFloor) {
+            this.player.attack += this.player.atkPerFloor;
+            this.ui.notify(`👑 Crown: +${this.player.atkPerFloor} ATK!`, '#ffd740', 2);
+        }
 
         // Floor milestones
         const milestones = {
