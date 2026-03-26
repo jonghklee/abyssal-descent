@@ -250,11 +250,12 @@ class MetaProgression {
         if (!this.data.totalPlayTime) this.data.totalPlayTime = 0;
         if (game && game.playTime) this.data.totalPlayTime += Math.floor(game.playTime);
 
-        // Earn souls based on performance
+        // Earn souls based on performance + ascension bonus
         const floorSouls = floor * 5;
         const killSouls = Math.floor(player.kills * 0.5);
         const levelSouls = player.level * 3;
-        const totalSouls = floorSouls + killSouls + levelSouls;
+        const ascensionMult = game?.ascension ? (1 + game.ascension.level * 0.5) : 1;
+        const totalSouls = Math.floor((floorSouls + killSouls + levelSouls) * ascensionMult);
         this.data.souls += totalSouls;
 
         this.save();
