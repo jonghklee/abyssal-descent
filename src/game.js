@@ -1962,13 +1962,24 @@ class Game {
                 ctx.fillText(String(stats[i][1]), w / 2 + 100, sy + i * 22);
             }
 
+            // New record check
+            const records = [];
+            if (this.meta && p.kills > (this.meta.data.bestKills || 0)) records.push('Kills');
+            if (this.meta && p.maxCombo > (this.meta.data.bestCombo || 0)) records.push('Combo');
+            if (records.length > 0) {
+                ctx.fillStyle = '#ffd740';
+                ctx.font = 'bold 12px monospace';
+                ctx.textAlign = 'center';
+                ctx.fillText(`🏆 NEW RECORD: ${records.join(', ')}!`, w / 2, h * 0.64);
+            }
+
             // Souls
             ctx.textAlign = 'center';
             ctx.fillStyle = '#b388ff';
             ctx.font = 'bold 18px monospace';
             ctx.shadowBlur = 10;
             ctx.shadowColor = '#b388ff';
-            ctx.fillText(`+${this.soulsEarned || 0} Souls (2x Victory Bonus!)`, w / 2, h * 0.68);
+            ctx.fillText(`+${this.soulsEarned || 0} Souls (2x Victory Bonus!)`, w / 2, h * 0.70);
             ctx.shadowBlur = 0;
 
             // Options
