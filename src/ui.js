@@ -177,6 +177,17 @@ class GameUI {
         const biomeIcon = biomeIcons[biomeId] || '';
         ctx.fillText(`${biomeIcon} Floor ${floor}`, w - 20, 30);
 
+        // Floor progress (enemies killed %)
+        if (typeof game !== 'undefined' && game.enemies) {
+            const alive = game.enemies.filter(e => e.alive && !e.isAlly).length;
+            const total = alive + player.kills; // approximate
+            if (total > 0 && alive > 0) {
+                ctx.fillStyle = '#37474f';
+                ctx.font = '8px monospace';
+                ctx.fillText(`${alive} left`, w - 20, 92);
+            }
+        }
+
         ctx.font = '11px monospace';
         ctx.fillStyle = '#ffd740';
         ctx.fillText(`Gold: ${player.gold}`, w - 20, 48);
