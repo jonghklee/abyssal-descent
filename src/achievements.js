@@ -46,6 +46,9 @@ const ACHIEVEMENT_DEFS = [
     { id: 'speed_5min',    name: 'Speedrunner',         desc: 'Clear floor 10 in under 5min', icon: '⚡', check: (s) => s.floor >= 10 && s.playTime < 300, reward: { gold: 300, gacha: true } },
     { id: 'no_potion',     name: 'Iron Man',            desc: 'Reach floor 5 without potions', icon: '💪', check: (s) => s.floor >= 5 && s.potionsUsed === 0, reward: { gold: 200 } },
     { id: 'win_necro',     name: 'Lord of the Dead',    desc: 'Win as Necromancer',           icon: '💀', check: (s) => s.isNecro && s.victory, reward: { gold: 500, gacha: true } },
+    { id: 'ascension_1',   name: 'Ascendant',           desc: 'Complete Ascension 1',         icon: '🔺', check: (s) => s.ascLevel >= 1, reward: { gold: 300 } },
+    { id: 'ascension_5',   name: 'Transcendent',        desc: 'Complete Ascension 5',         icon: '🌟', check: (s) => s.ascLevel >= 5, reward: { gold: 1000, gacha: true } },
+    { id: 'ascension_8',   name: 'Abyssal God',         desc: 'Complete Ascension 8 (MAX)',   icon: '👑', check: (s) => s.ascLevel >= 8, reward: { gold: 5000, gacha: true } },
 ];
 
 class AchievementSystem {
@@ -82,6 +85,7 @@ class AchievementSystem {
         this.stats.victory = game.state === 'victory';
         this.stats.playTime = game.playTime || 0;
         this.stats.potionsUsed = player._potionsUsed || 0;
+        this.stats.ascLevel = game.ascension ? game.ascension.level : 0;
 
         // Track classes played (persist in meta)
         if (game.meta && player.className) {
