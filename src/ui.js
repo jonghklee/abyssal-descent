@@ -502,7 +502,17 @@ class GameUI {
         // Subtitle
         ctx.font = '14px monospace';
         ctx.fillStyle = '#546e7a';
-        ctx.fillText('A Roguelike Dungeon Crawler', w / 2, titleY + 85);
+        const splashes = [
+            'A Roguelike Dungeon Crawler',
+            'Every death makes you stronger',
+            'The abyss stares back',
+            'One more run...',
+            'Can you reach floor 100?',
+            'Over 40 achievements to unlock',
+            'Find the hidden class!',
+            '4 classes, infinite builds',
+        ];
+        ctx.fillText(splashes[Math.floor(time / 4) % splashes.length], w / 2, titleY + 85);
         ctx.font = '10px monospace';
         ctx.fillStyle = '#37474f';
         ctx.fillText('4 Classes · Infinite Floors · 20+ Relics · Gacha · Pets · Forge · Daily Challenge', w / 2, titleY + 102);
