@@ -332,11 +332,19 @@ class GameUI {
         ctx.font = 'bold 10px monospace';
         ctx.fillText(`${boss.hp} / ${boss.maxHp}`, w / 2, y + 14);
 
+        // Remaining enemies in floor
+        if (typeof game !== 'undefined') {
+            const remaining = game.enemies.filter(e => e.alive && !e.isAlly).length;
+            ctx.fillStyle = '#78909c';
+            ctx.font = '8px monospace';
+            ctx.fillText(`${remaining} enemies remaining`, w / 2, y + barH + 12);
+        }
+
         // Phase indicator
         if (boss.phase >= 2) {
             ctx.fillStyle = '#ff6d00';
             ctx.font = 'bold 9px monospace';
-            ctx.fillText('ENRAGED', w / 2, y + barH + 12);
+            ctx.fillText('ENRAGED', w / 2, y + barH + 22);
         }
 
         // Border

@@ -374,7 +374,8 @@ class Player extends Entity {
                 return false;
             }
             this.potions--;
-            const heal = Math.floor(this.maxHp * 0.4);
+            const healPct = this.potionPower || 0.4;
+            const heal = Math.floor(this.maxHp * healPct);
             this.hp = Math.min(this.hp + heal, this.maxHp);
 
             // Healing VFX burst
