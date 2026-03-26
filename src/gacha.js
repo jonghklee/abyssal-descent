@@ -309,6 +309,10 @@ class GachaSystem {
                 this.reward.item.apply(player);
                 if (!player.relics) player.relics = [];
                 player.relics.push(this.reward.item);
+                if (typeof game !== 'undefined') {
+                    if (game.codex) game.codex.trackRelic(this.reward.item);
+                    if (game.synergySystem) game.synergySystem.check(player);
+                }
                 break;
             case 'consumable':
                 player.potions += this.reward.item.potions;
