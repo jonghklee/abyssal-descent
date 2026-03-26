@@ -474,13 +474,28 @@ class CombatSystem {
         player.gold += Math.floor(enemy.goldReward * goldMult);
         player.kills++;
 
-        // Kill milestone announcements
+        // Kill milestone announcements + secret weapon at 1000
         const killMilestones = { 50:'Slayer!', 100:'Centurion!', 200:'Destroyer!', 500:'Annihilator!', 1000:'LEGEND!' };
         if (killMilestones[player.kills]) {
             if (typeof game !== 'undefined' && game.ui) {
                 game.ui.notify(`☠ ${player.kills} KILLS — ${killMilestones[player.kills]}`, '#ff9800', 3);
                 Utils.addShake(8);
                 Utils.addFlash('#ff9800', 0.2);
+
+                // Secret: 1000 kills drops Infinity Blade
+                if (player.kills === 1000) {
+                    const infinity = new Weapon('sword', 'legendary');
+                    infinity.name = '∞ Infinity Blade';
+                    infinity.damage = 99;
+                    infinity.uniqueName = true;
+                    infinity.effects = ['fire', 'ice', 'chain', 'lifesteal'];
+                    game.weaponPickup = infinity;
+                    game.ui.notify('✨ THE INFINITY BLADE HAS APPEARED!', '#ffd740', 5);
+                    Utils.addShake(20);
+                    Utils.addFlash('#ffd740', 0.6);
+                    if (game.vfx) { game.vfx.screenCrack(); game.vfx.comboExplosion(); }
+                    GameAudio.play('bossDeath');
+                }
             }
         }
 
