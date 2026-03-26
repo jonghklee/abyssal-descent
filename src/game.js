@@ -1997,9 +1997,19 @@ class Game {
             ctx.fillText(`Kills: ${this.player.kills} | Gold: ${Math.floor(this.player.gold)} | Time: ${mins}m ${secs}s`, w / 2, h * 0.47);
             ctx.fillStyle = '#546e7a';
             ctx.font = '12px monospace';
-            ctx.fillText('[ESC] Resume  |  [C] Codex', w / 2, h * 0.58);
-            ctx.fillText('WASD Move | Click Attack | Space Dash', w / 2, h * 0.63);
-            ctx.fillText('Q Potion | E Switch | R Forge | T Slots | F Finisher', w / 2, h * 0.67);
+            // Progress
+            const achCount = this.achievements ? this.achievements.unlocked.size : 0;
+            const achTotal = typeof ACHIEVEMENT_DEFS !== 'undefined' ? ACHIEVEMENT_DEFS.length : 43;
+            const codexPct = this.codex ? this.codex.getCompletionPercent() : 0;
+            ctx.fillStyle = '#37474f';
+            ctx.font = '10px monospace';
+            ctx.fillText(`Achievements: ${achCount}/${achTotal} | Codex: ${codexPct}%`, w / 2, h * 0.53);
+
+            ctx.fillStyle = '#546e7a';
+            ctx.font = '12px monospace';
+            ctx.fillText('[ESC] Resume  |  [C] Codex  |  [Tab] Stats', w / 2, h * 0.60);
+            ctx.fillText('WASD Move | Click Attack | Space Dash | P Pet', w / 2, h * 0.65);
+            ctx.fillText('Q Potion | E Switch | R Forge | T Slots | F Finisher', w / 2, h * 0.69);
         }
 
         // ---- Death screen ----
