@@ -1,7 +1,7 @@
 {
   "name": "abyssal-descent",
-  "version": "0.1.0",
-  "description": "A roguelike dungeon crawler with procedural generation, real-time combat, and deep progression systems",
+  "version": "1.0.0",
+  "description": "A roguelike dungeon crawler with 4 classes, 192 content pieces, gacha, pets, and infinite replayability",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
