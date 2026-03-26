@@ -1040,9 +1040,7 @@ class Game {
                         if (enemy.isElite) this.achievements.addStat('eliteKills');
                         if (enemy.isBoss) this.achievements.addStat('bossKills');
                     }
-                    if (this.codex) {
-                        this.codex.trackEnemyKill(enemy);
-                    }
+                    // Codex tracking now handled in combat.onEnemyDeath
 
                     // Elite enemies drop gacha on kill
                     if (enemy.isElite && Math.random() < 0.4) {

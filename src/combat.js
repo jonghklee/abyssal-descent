@@ -465,6 +465,11 @@ class CombatSystem {
 
     onEnemyDeath(enemy, player) {
         player.gainXP(enemy.xpReward);
+        // Auto-track in codex
+        if (typeof game !== 'undefined' && game.codex) {
+            game.codex.trackEnemy(enemy);
+            game.codex.trackEnemyKill(enemy);
+        }
 
         // Daily challenge score
         if (typeof game !== 'undefined' && game.dailyChallenge && game.dailyChallenge.active) {
