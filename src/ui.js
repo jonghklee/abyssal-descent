@@ -578,10 +578,25 @@ class GameUI {
                     }
                 }
             }
+            // Player title based on progress
+            let title = '';
+            if (meta.victories >= 10) title = '👑 Abyssal Emperor';
+            else if (meta.victories >= 5) title = '⭐ Dungeon Master';
+            else if (meta.victories >= 1) title = '🏆 Abyss Conqueror';
+            else if (meta.bestFloor >= 15) title = '🗡 Veteran';
+            else if (meta.totalRuns >= 5) title = '⚔ Adventurer';
+            else if (meta.totalRuns >= 1) title = '🛡 Novice';
+
+            if (title) {
+                ctx.fillStyle = meta.victories >= 5 ? '#ffd740' : '#546e7a';
+                ctx.font = meta.victories >= 5 ? 'bold 11px monospace' : '10px monospace';
+                ctx.fillText(title, w / 2, menuY + 164);
+            }
+
             if (typeof game.ascension !== 'undefined' && game.ascension.level > 0) {
                 ctx.fillStyle = '#ffd740';
                 ctx.font = 'bold 10px monospace';
-                ctx.fillText(`★ Ascension ${game.ascension.level} ★`, w / 2, menuY + 148);
+                ctx.fillText(`★ Ascension ${game.ascension.level} ★`, w / 2, menuY + 180);
             }
         }
 
