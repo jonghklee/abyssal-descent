@@ -790,11 +790,20 @@ class Game {
             }
         }
 
-        // Check shrine/water room events
-        if (this.dungeon.tiles[playerTY] && this.dungeon.tiles[playerTY][playerTX] === TILE.WATER) {
+        // Overlay guard - prevent events/interactions while UI is open
+        const anyOverlayActive = (this.perks && this.perks.active) ||
+            (this.gacha && this.gacha.active) ||
+            (this.events && this.events.activeEvent) ||
+            (this.curseSystem && this.curseSystem.offerActive) ||
+            (this.luckWheel && this.luckWheel.active) ||
+            (this.slotMachine && this.slotMachine.active) ||
+            (this.forge && this.forge.active) ||
+            this.weaponPickup;
+
+        // Check shrine/water room events (only if no overlay active)
+        if (!anyOverlayActive && this.dungeon.tiles[playerTY] && this.dungeon.tiles[playerTY][playerTX] === TILE.WATER) {
             const shrineKey = `shrine_${playerTX},${playerTY}`;
             if (!this.openedChests.has(shrineKey)) {
-                // Check if in a shrine room
                 for (const room of this.dungeon.rooms) {
                     if (room.type === 'shrine' && room.contains(playerTX, playerTY)) {
                         this.openedChests.add(shrineKey);
@@ -808,7 +817,7 @@ class Game {
         // Random event chance when entering new rooms
         if (!this.lastRoom) this.lastRoom = null;
         const currentRoom = this.dungeon.rooms.find(r => r.contains(playerTX, playerTY));
-        if (currentRoom && currentRoom !== this.lastRoom) {
+        if (currentRoom && currentRoom !== this.lastRoom && !anyOverlayActive) {
             this.lastRoom = currentRoom;
 
             // Boss room entrance
