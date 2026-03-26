@@ -515,7 +515,7 @@ class GameUI {
         ctx.fillText(splashes[Math.floor(time / 4) % splashes.length], w / 2, titleY + 85);
         ctx.font = '10px monospace';
         ctx.fillStyle = '#37474f';
-        ctx.fillText('4 Classes · Infinite Floors · 20+ Relics · Gacha · Pets · Forge · Daily Challenge', w / 2, titleY + 102);
+        ctx.fillText('4 Classes · 188 Items · Gacha · Pets · Forge · Endless · Daily Challenge', w / 2, titleY + 102);
 
         // Menu options
         const menuY = h * 0.55;
@@ -579,7 +579,7 @@ class GameUI {
         // Version
         ctx.fillStyle = '#1a1a2e';
         ctx.font = '10px monospace';
-        ctx.fillText('v0.5.0 — Abyssal Descent', w / 2, h - 15);
+        ctx.fillText('v1.0 — Abyssal Descent', w / 2, h - 15);
     }
 
     drawDeathScreen(ctx, w, h, player, floor) {
