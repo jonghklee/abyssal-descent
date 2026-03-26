@@ -202,6 +202,10 @@ class CombatSystem {
                 let dmg = weapon.getDamage(player.attack, isCrit);
                 dmg = Math.max(1, dmg);
 
+                // Weapon set bonus: +15% if 2+ same type weapons
+                const sameType = player.weapons.filter(w => w.type === weapon.type).length;
+                if (sameType >= 2) dmg = Math.floor(dmg * 1.15);
+
                 // Rogue passive: first hit on fresh enemy = 2x
                 if (player.assassinFirstHit && !enemy._hitOnce) {
                     dmg *= 2;

@@ -206,7 +206,15 @@ class GameUI {
             ctx.font = '10px monospace';
             const totalDmg = weapon.damage + player.attack;
             const dps = (totalDmg / weapon.cooldown).toFixed(0);
-            ctx.fillText(`DMG:${totalDmg} DPS:${dps}  |  [E] Switch  |  [Click] Attack`, wbX, wbY + 18);
+
+            // Weapon set bonus check
+            const sameTypeCount = player.weapons.filter(w => w.type === weapon.type).length;
+            const setBonus = sameTypeCount >= 2 ? ' [SET +15%]' : '';
+            if (sameTypeCount >= 2 && !weapon._setApplied) {
+                weapon._setApplied = true; // Mark to avoid re-applying
+            }
+
+            ctx.fillText(`DMG:${totalDmg} DPS:${dps}${setBonus}  |  [E] Switch  |  [Click] Attack`, wbX, wbY + 18);
         }
 
         // ---- Combo counter ----
