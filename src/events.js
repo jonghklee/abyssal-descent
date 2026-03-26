@@ -147,6 +147,62 @@ const EVENT_TYPES = {
             { text: 'Leave it alone', apply: () => {} },
         ],
     },
+    weapon_blessing: {
+        name: 'Weapon Altar',
+        description: 'An ancient altar hums with power...',
+        icon: '⚔',
+        color: '#ff9800',
+        choices: [
+            { text: 'Bless weapon (+30% DMG)', apply: (p) => {
+                if (p.weapons.length > 0) {
+                    const w = p.weapons[p.currentWeapon];
+                    w.damage = Math.floor(w.damage * 1.3);
+                    return `${w.name} blessed! DMG: ${w.damage}`;
+                }
+                return 'No weapon to bless';
+            }},
+            { text: 'Enchant weapon (random effect)', apply: (p) => {
+                if (p.weapons.length > 0 && typeof ENCHANT_PREFIXES !== 'undefined') {
+                    const w = p.weapons[p.currentWeapon];
+                    if (!w.enchantPrefix) {
+                        w.enchantPrefix = Utils.randChoice(ENCHANT_PREFIXES);
+                        w.damage = Math.floor(w.damage * (1 + w.enchantPrefix.dmgBonus));
+                        w.effects.push(w.enchantPrefix.stat);
+                        w.name = w.enchantPrefix.name + ' ' + w.name;
+                        return `Enchanted: ${w.name}!`;
+                    }
+                    return 'Weapon already enchanted';
+                }
+            }},
+            { text: 'Leave', apply: () => {} },
+        ],
+    },
+    pet_shrine: {
+        name: 'Pet Shrine',
+        description: 'A warm glow emanates from a small statue...',
+        icon: '🐾',
+        color: '#e91e63',
+        choices: [
+            { text: 'Pray (Level up current pet)', apply: (p) => {
+                if (typeof game !== 'undefined' && game.petSystem && game.petSystem.activePet) {
+                    const pet = game.petSystem.activePet;
+                    pet.level += 2;
+                    if (pet.stats.dmg) pet.stats.dmg = Math.floor(pet.stats.dmg * 1.3);
+                    return `${pet.name} grew to Lv${pet.level}!`;
+                }
+                return 'No pet to bless';
+            }},
+            { text: 'Offer gold (50g → new pet)', cost: { gold: 50 }, apply: (p) => {
+                if (typeof game !== 'undefined' && game.petSystem) {
+                    const rarity = Utils.randChoice(['uncommon', 'rare', 'epic']);
+                    const def = game.petSystem.getRandomPet(rarity);
+                    const pet = game.petSystem.addPet(def);
+                    return `Got ${pet.name}! [${rarity}]`;
+                }
+            }},
+            { text: 'Leave', apply: () => {} },
+        ],
+    },
 };
 
 // Elite enemy modifiers
@@ -192,6 +248,7 @@ class EventSystem {
             eventPool.push('shrine_power', 'shrine_life', 'shrine_fortune', 'shrine_chaos', 'shrine_sacrifice');
         } else {
             eventPool.push('mysterious_merchant', 'trapped_soul', 'cursed_chest');
+            eventPool.push('weapon_blessing', 'pet_shrine');
             if (Math.random() < 0.15) eventPool.push('treasure_goblin');
         }
 
