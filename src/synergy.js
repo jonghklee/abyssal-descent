@@ -264,12 +264,12 @@ class MetaProgression {
 
     applyToPlayer(player) {
         const u = this.data.upgrades;
-        player.maxHp += u.startHp * 5;
+        player.maxHp += u.startHp * 8;    // 5→8 per level
         player.hp = player.maxHp;
-        player.attack += u.startAtk * 2;
-        player.defense += u.startDef * 1;
+        player.attack += u.startAtk * 3;  // 2→3 per level
+        player.defense += u.startDef * 2;  // 1→2 per level
         player.potions += u.startPotions * 1;
-        player.speed += u.startSpeed * 5;
+        player.speed += u.startSpeed * 8;  // 5→8 per level
 
         // Apply milestone unlocks
         const unlocks = this.data.unlocks || {};
@@ -322,11 +322,11 @@ class MetaProgression {
 
         // Upgrade grid
         const upgrades = [
-            { id: 'startHp',      name: 'Vitality',     desc: '+5 Starting HP',      icon: '♥' },
-            { id: 'startAtk',     name: 'Power',        desc: '+2 Starting ATK',     icon: '⚔' },
-            { id: 'startDef',     name: 'Armor',        desc: '+1 Starting DEF',     icon: '🛡' },
+            { id: 'startHp',      name: 'Vitality',     desc: '+8 Starting HP',      icon: '♥' },
+            { id: 'startAtk',     name: 'Power',        desc: '+3 Starting ATK',     icon: '⚔' },
+            { id: 'startDef',     name: 'Armor',        desc: '+2 Starting DEF',     icon: '🛡' },
             { id: 'startPotions', name: 'Alchemy',      desc: '+1 Starting Potion',  icon: '🧪' },
-            { id: 'startSpeed',   name: 'Agility',      desc: '+5 Starting Speed',   icon: '→' },
+            { id: 'startSpeed',   name: 'Agility',      desc: '+8 Starting Speed',   icon: '→' },
             { id: 'luckBoost',    name: 'Fortune',      desc: '+2% Gacha Luck',      icon: '🍀' },
             { id: 'xpBoost',      name: 'Wisdom',       desc: '+10% XP Gain',        icon: '📚' },
             { id: 'goldBoost',    name: 'Greed',        desc: '+10% Gold Gain',      icon: '💰' },
