@@ -819,6 +819,27 @@ class Game {
                             this.player.x, this.player.y - this.player.h / 2,
                             dmg, false
                         );
+
+                        // Thorn Armor relic: reflect damage
+                        if (this.player.thornDmg) {
+                            const reflectDmg = Math.floor(dmg * this.player.thornDmg);
+                            if (reflectDmg > 0) {
+                                enemy.takeDamage(reflectDmg, this.player.x, this.player.y);
+                                particles.hitSpark(enemy.x, enemy.y, '#66bb6a', 4);
+                            }
+                        }
+
+                        // Greed curse: lose gold on hit
+                        if (this.player.goldLossOnHit) {
+                            const loss = Math.floor(this.player.gold * 0.5);
+                            this.player.gold = Math.max(0, this.player.gold - loss);
+                            if (loss > 0) {
+                                this.combat.addDamageNumber(
+                                    this.player.x + 15, this.player.y - 10,
+                                    `-${loss}g`, false
+                                );
+                            }
+                        }
                     }
                 }
             }
@@ -1010,6 +1031,17 @@ class Game {
         const currentRoom = this.dungeon.rooms.find(r => r.contains(playerTX, playerTY));
         if (currentRoom && currentRoom !== this.lastRoom && !anyOverlayActive) {
             this.lastRoom = currentRoom;
+
+            // Chaos Dice relic: random ATK bonus each room
+            if (this.player.chaosDice) {
+                // Remove old bonus, add new
+                if (this.player._chaosBonus) this.player.attack -= this.player._chaosBonus;
+                this.player._chaosBonus = Utils.randInt(0, 20);
+                this.player.attack += this.player._chaosBonus;
+                if (this.player._chaosBonus > 10) {
+                    this.ui.notify(`🎲 Chaos: +${this.player._chaosBonus} ATK!`, '#ffd740', 1.5);
+                }
+            }
 
             // Boss room entrance
             if (currentRoom.type === 'boss' && !currentRoom.eventTriggered) {

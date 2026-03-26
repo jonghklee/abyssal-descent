@@ -66,7 +66,16 @@ class ClassSelect {
         player.potions = cls.potions;
 
         // Give class weapon
-        player.weapons = [new Weapon(cls.weapon.type, cls.weapon.rarity)];
+        // Use milestone unlocked rarity if better than class default
+        let weaponRarity = cls.weapon.rarity;
+        if (typeof game !== 'undefined' && game.meta && game.meta.data.unlocks) {
+            const unlockedRarity = game.meta.data.unlocks.startRarity;
+            const rarityOrder = ['common', 'uncommon', 'rare', 'epic', 'legendary'];
+            if (unlockedRarity && rarityOrder.indexOf(unlockedRarity) > rarityOrder.indexOf(weaponRarity)) {
+                weaponRarity = unlockedRarity;
+            }
+        }
+        player.weapons = [new Weapon(cls.weapon.type, weaponRarity)];
         player.currentWeapon = 0;
 
         // Apply passive
