@@ -173,11 +173,37 @@ class Player extends Entity {
             this.vy = this.dashDir.y * this.dashSpeed;
             this.invulnerable = 0.1;
 
-            // Dash trail
+            // Class-specific dash trail
             this.trailTimer += dt;
             if (this.trailTimer > 0.02) {
                 this.trailTimer = 0;
-                particles.trailEffect(this.x, this.y, '#64ffda');
+                const dashColor = this.classColor || '#64ffda';
+                particles.trailEffect(this.x, this.y, dashColor);
+
+                // Warrior: leave shockwave particles
+                if (this.className === 'Warrior' && Math.random() < 0.4) {
+                    particles.add(new Particle(this.x + Utils.rand(-8,8), this.y + Utils.rand(-8,8), {
+                        life: 0.15, size: Utils.rand(4,8), endSize: 12,
+                        color: 'rgba(244,67,54,0.2)',
+                    }));
+                }
+                // Rogue: after-images
+                if (this.className === 'Rogue' && Math.random() < 0.5) {
+                    particles.add(new Particle(this.x, this.y, {
+                        life: 0.2, size: 8, endSize: 0,
+                        color: 'rgba(100,255,218,0.3)',
+                        shape: 'square',
+                    }));
+                }
+                // Mage: arcane sparkles
+                if (this.className === 'Mage') {
+                    particles.add(new Particle(this.x + Utils.rand(-6,6), this.y + Utils.rand(-6,6), {
+                        life: 0.3, size: Utils.rand(1,3), endSize: 0,
+                        color: Utils.randChoice(['#7c4dff','#b388ff','#ea80fc']),
+                        glow: true, glowSize: 4,
+                        vy: Utils.rand(-1, 0),
+                    }));
+                }
             }
 
             if (this.dashDuration <= 0) {

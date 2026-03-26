@@ -918,6 +918,19 @@ class Game {
                 }
 
                 this.enemies.splice(i, 1);
+
+                // Last enemy in current room? Extra dramatic slowmo
+                if (this.lastRoom) {
+                    const ptx = Math.floor(this.player.x / TILE_SIZE);
+                    const pty = Math.floor(this.player.y / TILE_SIZE);
+                    const roomEnemies = this.enemies.filter(e => e.alive && this.lastRoom.contains(
+                        Math.floor(e.x / TILE_SIZE), Math.floor(e.y / TILE_SIZE)
+                    ));
+                    if (roomEnemies.length === 0 && this.lastRoom.enemies && this.lastRoom.enemies.length > 0) {
+                        Utils.addSlowMo(0.15, 0.6);
+                        Utils.addFreeze(4);
+                    }
+                }
             }
         }
 
