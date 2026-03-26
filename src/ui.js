@@ -600,6 +600,19 @@ class GameUI {
                 ctx.fillText(`Total: ${totalSouls} souls`, w / 2, soulY + 20);
             }
 
+            // Milestone unlocks
+            if (typeof game !== 'undefined' && game.milestoneUnlocks && game.milestoneUnlocks.length > 0) {
+                const unlockY = cardY + cardH - 40;
+                ctx.fillStyle = '#ffd740';
+                ctx.font = 'bold 10px monospace';
+                ctx.fillText('✨ NEW UNLOCKS:', w / 2, unlockY);
+                for (let i = 0; i < game.milestoneUnlocks.length; i++) {
+                    ctx.fillStyle = '#ffd740';
+                    ctx.font = '9px monospace';
+                    ctx.fillText(game.milestoneUnlocks[i], w / 2, unlockY + 14 + i * 12);
+                }
+            }
+
             // Options
             if (this.deathTimer > 2.5) {
                 const optY = h * 0.78;

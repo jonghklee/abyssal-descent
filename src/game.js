@@ -1157,6 +1157,12 @@ class Game {
                         this.meta.save();
                     }
                     this.soulsEarned = soulsEarned;
+
+                    // Check milestone unlocks
+                    const newUnlocks = this.meta.checkMilestones(this);
+                    if (newUnlocks.length > 0) {
+                        this.milestoneUnlocks = newUnlocks;
+                    }
                 }
             }
         }

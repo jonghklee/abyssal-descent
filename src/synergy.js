@@ -168,7 +168,39 @@ class MetaProgression {
             },
             achievements: [],
             petsUnlocked: [],
+            unlocks: {},       // Permanent unlocks
+            milestones: {},    // Completed milestones
+            classesPlayed: {}, // Track classes used
         };
+    }
+
+    // Check and apply milestone unlocks
+    checkMilestones(game) {
+        const d = this.data;
+        if (!d.milestones) d.milestones = {};
+        if (!d.unlocks) d.unlocks = {};
+        const milestones = [
+            { id: 'kills_100',   check: d.totalKills >= 100,    reward: 'Start +5 ATK',       apply: () => { d.unlocks.bonusAtk = 5; } },
+            { id: 'kills_500',   check: d.totalKills >= 500,    reward: 'Start +10 ATK',      apply: () => { d.unlocks.bonusAtk = 10; } },
+            { id: 'kills_1000',  check: d.totalKills >= 1000,   reward: 'Start +20 ATK',      apply: () => { d.unlocks.bonusAtk = 20; } },
+            { id: 'floor_10',    check: d.bestFloor >= 10,      reward: 'Unlock Rare start weapon', apply: () => { d.unlocks.startRarity = 'rare'; } },
+            { id: 'floor_20',    check: d.bestFloor >= 20,      reward: 'Unlock Epic start weapon', apply: () => { d.unlocks.startRarity = 'epic'; } },
+            { id: 'runs_10',     check: d.totalRuns >= 10,      reward: '+50 Start HP',        apply: () => { d.unlocks.bonusHp = 50; } },
+            { id: 'runs_25',     check: d.totalRuns >= 25,      reward: '+100 Start HP',       apply: () => { d.unlocks.bonusHp = 100; } },
+            { id: 'boss_5',      check: d.totalBossKills >= 5,  reward: 'Start +5 DEF',       apply: () => { d.unlocks.bonusDef = 5; } },
+            { id: 'gold_5000',   check: d.totalGold >= 5000,    reward: 'Start +100 Gold',    apply: () => { d.unlocks.startGold = 100; } },
+        ];
+
+        let newUnlocks = [];
+        for (const m of milestones) {
+            if (m.check && !d.milestones[m.id]) {
+                d.milestones[m.id] = true;
+                m.apply();
+                newUnlocks.push(m.reward);
+            }
+        }
+        if (newUnlocks.length > 0) this.save();
+        return newUnlocks;
     }
 
     save() {
@@ -203,6 +235,13 @@ class MetaProgression {
         player.defense += u.startDef * 1;
         player.potions += u.startPotions * 1;
         player.speed += u.startSpeed * 5;
+
+        // Apply milestone unlocks
+        const unlocks = this.data.unlocks || {};
+        if (unlocks.bonusAtk) player.attack += unlocks.bonusAtk;
+        if (unlocks.bonusHp) { player.maxHp += unlocks.bonusHp; player.hp = player.maxHp; }
+        if (unlocks.bonusDef) player.defense += unlocks.bonusDef;
+        if (unlocks.startGold) player.gold += unlocks.startGold;
     }
 
     getUpgradeCost(upgradeId) {
