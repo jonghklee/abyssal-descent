@@ -257,7 +257,8 @@ class CombatSystem {
                     particles.hitSpark(enemy.x, enemy.y,
                         isCrit ? '#ffeb3b' : weapon.color, isCrit ? 15 : 8);
 
-                    Utils.addShake(isCrit ? 6 : 3);
+                    Utils.addShake(isCrit ? 6 : 2);
+                    Utils.addFreeze(1); // Micro hitstop on every hit for weight
                     if (isCrit) {
                         Utils.addFreeze(3);
                         Utils.addFlash('#ffeb3b', 0.15);
