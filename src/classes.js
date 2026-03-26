@@ -261,11 +261,33 @@ class ClassSelect {
             ctx.restore();
         }
 
+        // Show locked class hint if not yet unlocked
+        if (!this.isHiddenUnlocked()) {
+            const lockX = startX + classes.length * (cardW + gap);
+            if (lockX + cardW < w) {
+                ctx.fillStyle = 'rgba(15,15,25,0.5)';
+                ctx.fillRect(lockX, cardY, cardW, cardH);
+                ctx.strokeStyle = '#263238';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([4, 4]);
+                ctx.strokeRect(lockX, cardY, cardW, cardH);
+                ctx.setLineDash([]);
+                ctx.textAlign = 'center';
+                ctx.fillStyle = '#37474f';
+                ctx.font = '24px monospace';
+                ctx.fillText('🔒', lockX + cardW / 2, cardY + cardH / 2 - 10);
+                ctx.font = '9px monospace';
+                ctx.fillText('Play all 3 classes', lockX + cardW / 2, cardY + cardH / 2 + 12);
+                ctx.fillText('& reach floor 10', lockX + cardW / 2, cardY + cardH / 2 + 24);
+            }
+        }
+
         // Instructions
         ctx.textAlign = 'center';
         ctx.fillStyle = '#455a64';
         ctx.font = '11px monospace';
-        ctx.fillText('Press 1, 2, or 3  |  Hover to preview', w / 2, h * 0.92);
+        const keyCount = classes.length;
+        ctx.fillText(`Press 1-${keyCount}  |  Hover to preview`, w / 2, h * 0.92);
     }
 
     wrapText(text, maxChars) {
