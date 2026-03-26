@@ -306,7 +306,16 @@ class Game {
         }
 
         // Give starter pet
-        const starterPet = this.petSystem.getRandomPet('common');
+        // Class-specific starter pet
+        const classPets = {
+            'Warrior': 'golem',       // Tank pet for tank class
+            'Rogue': 'ghost_pet',     // Fast wolf for fast class
+            'Mage': 'skull',          // Ranged skull for ranged class
+            'Necromancer': 'bat_pet', // Bat for dark class
+        };
+        const petId = classPets[this.player.className];
+        const petDef = petId ? PET_DEFS.find(p => p.id === petId) : null;
+        const starterPet = petDef || this.petSystem.getRandomPet('common');
         this.petSystem.addPet(starterPet);
         this.player.relics = [];
 

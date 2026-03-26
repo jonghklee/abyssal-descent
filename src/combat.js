@@ -462,6 +462,16 @@ class CombatSystem {
         player.gold += enemy.goldReward;
         player.kills++;
 
+        // Kill milestone announcements
+        const killMilestones = { 50:'Slayer!', 100:'Centurion!', 200:'Destroyer!', 500:'Annihilator!', 1000:'LEGEND!' };
+        if (killMilestones[player.kills]) {
+            if (typeof game !== 'undefined' && game.ui) {
+                game.ui.notify(`☠ ${player.kills} KILLS — ${killMilestones[player.kills]}`, '#ff9800', 3);
+                Utils.addShake(8);
+                Utils.addFlash('#ff9800', 0.2);
+            }
+        }
+
         // First kill celebration
         if (typeof game !== 'undefined' && !game.firstKillDone && player.kills === 1) {
             game.firstKillDone = true;
