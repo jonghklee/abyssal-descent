@@ -733,20 +733,18 @@ class GameUI {
                 ctx.font = '10px monospace';
                 ctx.fillText('or click anywhere', w / 2, optY + 22);
 
-                // Random death tip
-                const tips = [
-                    'TIP: Use SPACE to dash through enemy attacks!',
-                    'TIP: Press R to forge weapons — combine 2 for higher rarity!',
-                    'TIP: Try a different class for new strategies!',
-                    'TIP: Collect relics — some have powerful synergies!',
-                    'TIP: Hold click for a charged attack (up to 3x damage)!',
-                    'TIP: Press C to check your Codex collection!',
-                    'TIP: Soul Forge upgrades persist between runs!',
-                    'TIP: Secret rooms have 3 chests and no enemies!',
-                    'TIP: Golden enemies are rare but give 10x gold!',
-                    'TIP: Pets evolve at level 10 with 2x power!',
-                    'TIP: Type "ABYSS" during gameplay for a surprise...',
-                ];
+                // Context-aware death tips
+                const tips = [];
+                if (player.potions > 0) tips.push('TIP: You had potions left! Press Q to heal!');
+                if (!player.relics || player.relics.length === 0) tips.push('TIP: Defeat bosses to get relics!');
+                if (player.maxCombo < 10) tips.push('TIP: Build combos for damage multipliers!');
+                if (player.weapons.length < 2) tips.push('TIP: Collect multiple weapons and press E to switch!');
+                // Generic tips as fallback
+                tips.push('TIP: Hold click for a charged attack (up to 3x damage)!');
+                tips.push('TIP: Press R to forge weapons — combine 2 for higher rarity!');
+                tips.push('TIP: Pets evolve at level 10 with 2x power!');
+                tips.push('TIP: Golden enemies are rare but give 10x gold!');
+                tips.push('TIP: Soul Forge upgrades persist between runs!');
                 const tipIdx = Math.floor(Date.now() / 5000) % tips.length;
                 ctx.fillStyle = '#37474f';
                 ctx.font = '9px monospace';
