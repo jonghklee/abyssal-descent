@@ -1058,6 +1058,21 @@ class Game {
         }
         if (this.achievements) this.achievements.update(dt);
 
+        // Codex rewards (low frequency)
+        if (this.codex && Math.random() < 0.005) {
+            const rewards = this.codex.checkRewards();
+            for (const r of rewards) {
+                this.meta.data.souls += r.souls;
+                this.meta.save();
+                this.ui.notify(`📖 Codex ${r.pct}%: ${r.reward}!`, '#64ffda', 4);
+                if (r.gacha) {
+                    setTimeout(() => this.gacha.pull(this.floor, (rw) => {
+                        if (rw.type === 'weapon') this.weaponPickup = rw.item;
+                    }), 2000);
+                }
+            }
+        }
+
         // Check room clear
         this.checkRoomClears();
 

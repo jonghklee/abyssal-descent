@@ -84,6 +84,32 @@ class Codex {
         return Math.min(100, Math.round(found / total * 100));
     }
 
+    checkRewards() {
+        const pct = this.getCompletionPercent();
+        if (!this.data.rewards) this.data.rewards = {};
+        const rewards = [];
+
+        if (pct >= 25 && !this.data.rewards['25']) {
+            this.data.rewards['25'] = true;
+            rewards.push({ pct: 25, reward: '+50 Souls', souls: 50 });
+        }
+        if (pct >= 50 && !this.data.rewards['50']) {
+            this.data.rewards['50'] = true;
+            rewards.push({ pct: 50, reward: '+200 Souls + Gacha', souls: 200, gacha: true });
+        }
+        if (pct >= 75 && !this.data.rewards['75']) {
+            this.data.rewards['75'] = true;
+            rewards.push({ pct: 75, reward: '+500 Souls', souls: 500 });
+        }
+        if (pct >= 100 && !this.data.rewards['100']) {
+            this.data.rewards['100'] = true;
+            rewards.push({ pct: 100, reward: 'COMPLETIONIST! +1000 Souls', souls: 1000 });
+        }
+
+        if (rewards.length > 0) this.save();
+        return rewards;
+    }
+
     draw(ctx, w, h) {
         if (!this.showScreen) return;
 
