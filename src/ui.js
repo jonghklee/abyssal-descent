@@ -426,7 +426,7 @@ class GameUI {
         const ctrlY = h * 0.85;
         ctx.fillStyle = '#37474f';
         ctx.font = '10px monospace';
-        ctx.fillText('WASD Move | Click Attack | Space Dash | Q Potion | E Switch | R Forge | T Slots | F Finisher', w / 2, ctrlY);
+        ctx.fillText('WASD Move | Click Attack | Space Dash | Q Potion | E Switch | R Forge | T Slots | F Finisher | C Codex', w / 2, ctrlY);
 
         // Version
         ctx.fillStyle = '#1a1a2e';

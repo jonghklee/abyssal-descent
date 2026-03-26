@@ -317,10 +317,31 @@ class Player extends Entity {
 
     usePotion() {
         if (this.potions > 0 && this.hp < this.maxHp) {
+            // No healing if no-heal floor modifier
+            if (typeof game !== 'undefined' && game.noHeal) {
+                return false;
+            }
             this.potions--;
             const heal = Math.floor(this.maxHp * 0.4);
             this.hp = Math.min(this.hp + heal, this.maxHp);
+
+            // Healing VFX burst
             particles.itemPickup(this.x, this.y, '#66bb6a');
+            for (let i = 0; i < 15; i++) {
+                const angle = (i / 15) * Math.PI * 2;
+                particles.add(new Particle(this.x, this.y, {
+                    vx: Math.cos(angle) * Utils.rand(1, 3),
+                    vy: Math.sin(angle) * Utils.rand(1, 3) - 1,
+                    life: Utils.rand(0.3, 0.8),
+                    size: Utils.rand(2, 4),
+                    endSize: 0,
+                    color: Utils.randChoice(['#66bb6a', '#a5d6a7', '#c8e6c9', '#fff']),
+                    glow: true,
+                    glowSize: 6,
+                }));
+            }
+            // Green flash
+            Utils.addFlash('#4caf50', 0.15);
             GameAudio.play('heal');
             return true;
         }

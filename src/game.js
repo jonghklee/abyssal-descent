@@ -1167,6 +1167,21 @@ class Game {
             ctx.globalAlpha = 1;
         }
 
+        // ---- Low HP vignette ----
+        if (this.player && this.player.alive) {
+            const hpPct = this.player.hp / this.player.maxHp;
+            if (hpPct < 0.35) {
+                const intensity = (0.35 - hpPct) / 0.35;
+                const pulse = Math.sin(Date.now() * 0.005) * 0.1 + 0.9;
+                const vigAlpha = intensity * 0.5 * pulse;
+                const grad = ctx.createRadialGradient(w/2, h/2, w*0.25, w/2, h/2, w*0.7);
+                grad.addColorStop(0, 'rgba(0,0,0,0)');
+                grad.addColorStop(1, `rgba(180,0,0,${vigAlpha})`);
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, w, h);
+            }
+        }
+
         // ---- HUD ----
         if (this.state === 'playing' || this.state === 'dead') {
             this.ui.drawHUD(ctx, this.player, this.floor, this);
