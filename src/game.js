@@ -159,6 +159,16 @@ class Game {
                 this.ui.minimap = !this.ui.minimap;
             }
 
+            // Volume control (+/-)
+            if (e.code === 'Equal' || e.code === 'NumpadAdd') {
+                GameAudio.masterVolume = Math.min(1, GameAudio.masterVolume + 0.05);
+                this.ui?.notify(`Volume: ${Math.round(GameAudio.masterVolume * 100)}%`, '#78909c', 1);
+            }
+            if (e.code === 'Minus' || e.code === 'NumpadSubtract') {
+                GameAudio.masterVolume = Math.max(0, GameAudio.masterVolume - 0.05);
+                this.ui?.notify(`Volume: ${Math.round(GameAudio.masterVolume * 100)}%`, '#78909c', 1);
+            }
+
             // Pet switch (P)
             if (e.code === 'KeyP' && this.state === 'playing' && this.petSystem) {
                 const pets = this.petSystem.collection;
