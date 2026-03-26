@@ -49,6 +49,33 @@ const SYNERGY_DEFS = [
         requires: ['luckyCharm', 'ironShield'],
         apply: (p) => { p.critGold = true; },
     },
+    {
+        id: 'eternal_king',
+        name: 'Eternal King',
+        desc: 'Crown + Soul Jar: 3x Souls earned!',
+        icon: '👑🏺',
+        color: '#ffd740',
+        requires: ['crown', 'souljar'],
+        apply: (p) => { p.soulBonus = 3.0; },
+    },
+    {
+        id: 'chaos_magnet',
+        name: 'Chaos Magnet',
+        desc: 'Dice + Magnet: items fly to you from everywhere!',
+        icon: '🎲🧲',
+        color: '#ff9800',
+        requires: ['dice', 'magnet'],
+        apply: (p) => { p.magnetMult = 5.0; },
+    },
+    {
+        id: 'time_lord',
+        name: 'Time Lord',
+        desc: 'Hourglass + Compass: enemies move 50% slower!',
+        icon: '⏳🧭',
+        color: '#4fc3f7',
+        requires: ['hourglass', 'compass'],
+        apply: (p) => { p.auraSlowPct = 0.5; },
+    },
 ];
 
 class SynergySystem {

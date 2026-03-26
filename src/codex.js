@@ -18,6 +18,22 @@ const ENEMY_LORE = {
     boss_dragon: 'The ancient wyrm that guards the deepest depths.',
 };
 
+const PET_LORE = {
+    wisp: 'A tiny spark of lost magic, loyal to its finder.',
+    bat_pet: 'Rescued from the crypt, now fights by your side.',
+    slimeling: 'A friendly blob that bounces with joy.',
+    skull: 'A chattering skull that never stops talking.',
+    fairy: 'A kind spirit that mends your wounds.',
+    imp: 'Mischievous but loyal, loves setting things on fire.',
+    dragon: 'A baby dragon imprinted on you at birth.',
+    golem: 'A miniature stone guardian, unbreakable.',
+    ghost_pet: 'The spirit of a wolf, faster than wind.',
+    phoenix_pet: 'Born from flame, it refuses to stay dead.',
+    mimic: 'A chest that decided YOU were the real treasure.',
+    angel: 'A fallen angel seeking redemption through battle.',
+    void_pet: 'A fragment of the void itself, bending space.',
+};
+
 class Codex {
     constructor() {
         this.data = this.load();
@@ -264,11 +280,12 @@ class Codex {
     getPetEntries() {
         return PET_DEFS.map(def => {
             const data = this.data.pets[def.id];
+            const lore = PET_LORE[def.id] || '';
             return {
                 found: !!data,
                 name: def.name,
                 icon: data ? def.icon : '?',
-                detail: data ? `[${def.rarity}]` : '',
+                detail: data ? `[${def.rarity}] ${lore}` : '',
                 color: GACHA_RARITIES[def.rarity]?.color || '#78909c',
             };
         });
