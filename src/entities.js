@@ -488,6 +488,10 @@ class Enemy extends Entity {
         this.phasing = def.phasing || false;
         this.isBoss = def.isBoss || false;
 
+        // Spawn animation
+        this.spawnTimer = 0.5;
+        this.spawning = true;
+
         // State machine
         this.state = 'idle';
         this.stateTimer = 0;
@@ -506,6 +510,16 @@ class Enemy extends Entity {
 
     update(dt, dungeon, player) {
         if (!this.alive) return;
+
+        // Spawn animation
+        if (this.spawning) {
+            this.spawnTimer -= dt;
+            if (this.spawnTimer <= 0) {
+                this.spawning = false;
+            }
+            return; // Don't move during spawn
+        }
+
         if (this.attackCooldown > 0) this.attackCooldown -= dt;
         this.stateTimer += dt;
 
@@ -806,8 +820,23 @@ class Enemy extends Entity {
         ctx.save();
         ctx.translate(this.x, this.y);
 
+        // Spawn fade-in
+        if (this.spawning) {
+            const spawnPct = 1 - (this.spawnTimer / 0.5);
+            ctx.globalAlpha = spawnPct;
+            // Spawn particles
+            if (Math.random() < 0.3) {
+                particles.add(new Particle(this.x + Utils.rand(-10, 10), this.y + Utils.rand(-10, 10), {
+                    life: 0.3, size: Utils.rand(1, 3), endSize: 0,
+                    color: this.isBoss ? '#ff1744' : '#7c4dff',
+                    vy: -1, glow: true, glowSize: 4,
+                }));
+            }
+            ctx.scale(spawnPct, spawnPct);
+        }
+
         if (this.flashTimer > 0) {
-            ctx.globalAlpha = 0.5 + Math.sin(this.flashTimer * 30) * 0.5;
+            ctx.globalAlpha = Math.min(ctx.globalAlpha, 0.5 + Math.sin(this.flashTimer * 30) * 0.5);
         }
 
         const bobY = Math.sin(this.animTimer * 6) * 2;

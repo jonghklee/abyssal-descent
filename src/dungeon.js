@@ -432,16 +432,41 @@ class DungeonRenderer {
         ctx.strokeStyle = 'rgba(255,255,255,0.03)';
         ctx.strokeRect(wx, wy, TILE_SIZE, TILE_SIZE);
 
-        // Occasional floor detail
-        if ((tx * 31 + ty * 17) % 13 === 0) {
-            ctx.fillStyle = 'rgba(255,255,255,0.05)';
-            ctx.fillRect(wx + 8, wy + 12, 4, 2);
-        }
-        if ((tx * 23 + ty * 37) % 17 === 0) {
-            ctx.fillStyle = 'rgba(255,255,255,0.03)';
+        // Floor details — procedural decoration based on tile hash
+        const hash = (tx * 31 + ty * 17);
+        if (hash % 13 === 0) {
+            // Small crack
+            ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+            ctx.lineWidth = 0.5;
             ctx.beginPath();
-            ctx.arc(wx + 20, wy + 16, 2, 0, Math.PI * 2);
+            ctx.moveTo(wx + 8, wy + 12);
+            ctx.lineTo(wx + 16, wy + 18);
+            ctx.lineTo(wx + 22, wy + 15);
+            ctx.stroke();
+        }
+        if (hash % 19 === 0) {
+            // Tiny pebble
+            ctx.fillStyle = 'rgba(255,255,255,0.04)';
+            ctx.beginPath();
+            ctx.arc(wx + 20, wy + 16, 1.5, 0, Math.PI * 2);
             ctx.fill();
+        }
+        if (hash % 37 === 0) {
+            // Dark stain
+            ctx.fillStyle = 'rgba(0,0,0,0.08)';
+            ctx.beginPath();
+            ctx.ellipse(wx + 14, wy + 20, 5, 3, hash % 3, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        if (hash % 47 === 0) {
+            // Bone fragment
+            ctx.fillStyle = 'rgba(200,200,180,0.06)';
+            ctx.fillRect(wx + 10 + (hash % 10), wy + 8 + (hash % 8), 4, 1.5);
+        }
+        if (hash % 61 === 0) {
+            // Moss/vegetation
+            ctx.fillStyle = 'rgba(60,120,60,0.06)';
+            ctx.fillRect(wx + 5 + (hash % 15), wy + 5 + (hash % 12), 3, 3);
         }
     }
 

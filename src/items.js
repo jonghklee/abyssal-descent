@@ -59,8 +59,17 @@ class ItemDrop {
 
         switch (this.type) {
             case 'gold':
-                player.gold += this.data.amount || 1;
+                const goldAmt = this.data.amount || 1;
+                player.gold += goldAmt;
                 particles.itemPickup(this.x, this.y, '#ffd740');
+                // Floating gold text
+                if (typeof game !== 'undefined' && game.combat) {
+                    game.combat.damageNumbers.push({
+                        x: this.x, y: this.y - 10,
+                        text: `+${goldAmt}g`, color: '#ffd740',
+                        size: 10, life: 0.8, vy: -1.5, isCrit: false,
+                    });
+                }
                 GameAudio.play('coin');
                 break;
             case 'xpOrb':
