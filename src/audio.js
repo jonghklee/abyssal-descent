@@ -95,8 +95,11 @@ const GameAudio = {
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = 'square';
-        osc.frequency.setValueAtTime(400, t);
-        osc.frequency.exponentialRampToValueAtTime(50, t + 0.3);
+        // Pitch increases with kill streak for satisfying rapid kills
+        const streakBonus = (typeof game !== 'undefined' && game.killStreak) ?
+            Math.min(game.killStreak.streak * 30, 400) : 0;
+        osc.frequency.setValueAtTime(400 + streakBonus, t);
+        osc.frequency.exponentialRampToValueAtTime(50 + streakBonus * 0.3, t + 0.3);
         gain.gain.setValueAtTime(0.15, t);
         gain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
         osc.connect(gain);

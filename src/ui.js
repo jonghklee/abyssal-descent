@@ -120,8 +120,20 @@ class GameUI {
         ctx.fillStyle = 'rgba(0,0,0,0.4)';
         ctx.fillRect(hpX, xpY, xpBarW, xpBarH);
         const xpPercent = player.xp / player.xpToLevel;
-        ctx.fillStyle = '#64ffda';
+        // Flash when close to level up
+        const nearLevel = xpPercent > 0.85;
+        ctx.fillStyle = nearLevel ? (Math.sin(Date.now() * 0.01) > 0 ? '#64ffda' : '#a7ffeb') : '#64ffda';
         ctx.fillRect(hpX, xpY, xpBarW * xpPercent, xpBarH);
+
+        // XP remaining hint
+        if (xpPercent > 0.5) {
+            ctx.fillStyle = '#455a64';
+            ctx.font = '7px monospace';
+            ctx.textAlign = 'right';
+            const remaining = player.xpToLevel - player.xp;
+            ctx.fillText(`${remaining} XP to Lv${player.level + 1}`, hpX + xpBarW, xpY + xpBarH + 8);
+            ctx.textAlign = 'left';
+        }
 
         // Level + class
         ctx.fillStyle = '#64ffda';
