@@ -1022,11 +1022,34 @@ class Game {
 
             if (room.enemies.length > 0 && aliveInRoom.length === 0) {
                 room.cleared = true;
-                this.ui.notify('Room Cleared!', '#64ffda');
 
-                // Bonus reward for clearing a room
+                // Room clear bonus
+                const goldBonus = 5 + this.floor * 2;
+                this.player.gold += goldBonus;
+                this.ui.notify(`Room Cleared! +${goldBonus}g`, '#64ffda');
+                particles.levelUpEffect(this.player.x, this.player.y);
+
+                // Boss defeat reward
                 if (room.type === 'boss') {
                     this.ui.notify('BOSS DEFEATED!', '#ff1744', 5);
+                    Utils.addShake(12);
+                    Utils.addSlowMo(0.15, 1.5);
+                    if (this.vfx) {
+                        this.vfx.screenCrack();
+                        this.vfx.comboExplosion();
+                    }
+                    // Boss drops gacha + gold
+                    this.player.gold += 50 + this.floor * 10;
+                    setTimeout(() => {
+                        this.gacha.pull(this.floor, (reward) => {
+                            if (reward.type === 'weapon') this.weaponPickup = reward.item;
+                        });
+                    }, 2000);
+                }
+
+                // Achievement: perfect room (no damage taken — check if HP is still max)
+                if (this.player.hp === this.player.maxHp && this.achievements) {
+                    this.achievements.addStat('perfectRooms');
                 }
             }
         }

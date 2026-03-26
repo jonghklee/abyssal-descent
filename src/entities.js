@@ -656,12 +656,53 @@ class Enemy extends Entity {
             Utils.addShake(15);
             Utils.addFlash('#ff1744', 0.5);
             particles.explosion(this.x, this.y, '#ff1744', 50);
+
+            // Boss-specific phase 2 effects
+            if (this.type === 'boss_lich') {
+                // Lich summons minions
+                for (let i = 0; i < 4; i++) {
+                    const angle = (i / 4) * Math.PI * 2;
+                    const sx = this.x + Math.cos(angle) * 60;
+                    const sy = this.y + Math.sin(angle) * 60;
+                    if (typeof game !== 'undefined') {
+                        const minion = new Enemy(sx, sy, 'skeleton');
+                        minion.maxHp = 20; minion.hp = 20;
+                        minion.baseAttack = 5;
+                        game.enemies.push(minion);
+                        particles.explosion(sx, sy, '#e040fb', 10);
+                    }
+                }
+            } else if (this.type === 'boss_dragon') {
+                // Dragon flame aura - continuous damage zone
+                this.flameAura = true;
+            }
+        }
+
+        // Phase 3 at 25% HP for dragon
+        if (this.type === 'boss_dragon' && this.hp < this.maxHp * 0.25 && this.phase === 2) {
+            this.phase = 3;
+            this.speed *= 1.5;
+            Utils.addShake(20);
+            Utils.addFlash('#ff6d00', 0.6);
+        }
+
+        // Dragon flame aura
+        if (this.flameAura && dist < 80) {
+            if (Math.random() < 0.1) {
+                player.takeDamage(2, this.x, this.y);
+                particles.add(new Particle(player.x + Utils.rand(-10,10), player.y + Utils.rand(-10,10), {
+                    life: 0.3, size: 3, endSize: 0,
+                    color: Utils.randChoice(['#ff6d00','#ff3d00']),
+                    glow: true, glowSize: 6,
+                }));
+            }
         }
 
         // Attack patterns rotate
+        const patternCount = this.type === 'boss_dragon' ? 4 : (this.type === 'boss_lich' ? 4 : 3);
         if (this.attackCooldown <= 0 && dist < this.aggroRange) {
             this.attackCooldown = this.attackMaxCooldown;
-            this.bossAttackPattern = (this.bossAttackPattern + 1) % 3;
+            this.bossAttackPattern = (this.bossAttackPattern + 1) % patternCount;
 
             switch (this.bossAttackPattern) {
                 case 0: // Charge
@@ -687,6 +728,50 @@ class Enemy extends Entity {
                 case 2: // Slam
                     Utils.addShake(10);
                     particles.explosion(this.x, this.y, '#ff6600', 40);
+                    // Slam damages nearby player
+                    if (dist < 80) {
+                        player.takeDamage(Math.floor(this.baseAttack * 0.8), this.x, this.y);
+                    }
+                    break;
+                case 3: // Boss-specific special attack
+                    if (this.type === 'boss_lich') {
+                        // Lich: teleport behind player + dark blast
+                        const behindAngle = Utils.angle(this.x, this.y, player.x, player.y);
+                        particles.explosion(this.x, this.y, '#e040fb', 15);
+                        this.x = player.x - Math.cos(behindAngle) * 80;
+                        this.y = player.y - Math.sin(behindAngle) * 80;
+                        particles.explosion(this.x, this.y, '#e040fb', 15);
+                        // Dark blast in cone
+                        for (let i = 0; i < 8; i++) {
+                            const a = behindAngle + Utils.rand(-0.4, 0.4);
+                            this.projectiles.push({
+                                x: this.x, y: this.y,
+                                vx: Math.cos(a) * 250,
+                                vy: Math.sin(a) * 250,
+                                damage: this.baseAttack * 0.4,
+                                life: 2, size: 5,
+                                color: '#e040fb',
+                            });
+                        }
+                        Utils.addShake(8);
+                    } else if (this.type === 'boss_dragon') {
+                        // Dragon: fire breath line
+                        const breathAngle = Utils.angle(this.x, this.y, player.x, player.y);
+                        for (let i = 0; i < 15; i++) {
+                            const spread = Utils.rand(-0.2, 0.2);
+                            const spd = 150 + i * 20;
+                            this.projectiles.push({
+                                x: this.x, y: this.y,
+                                vx: Math.cos(breathAngle + spread) * spd,
+                                vy: Math.sin(breathAngle + spread) * spd,
+                                damage: this.baseAttack * 0.3,
+                                life: 1.5, size: 4 + i * 0.3,
+                                color: Utils.randChoice(['#ff6d00', '#ff3d00', '#ffab00']),
+                            });
+                        }
+                        Utils.addShake(6);
+                        GameAudio.play('attack');
+                    }
                     break;
             }
         }
