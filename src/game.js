@@ -660,9 +660,64 @@ class Game {
         // Player
         this.player.update(dt, this.dungeon, this.input);
 
-        // Attack
+        // Attack with charge mechanic
+        if (!this.chargeTimer) this.chargeTimer = 0;
         if (this.input.mouseDown) {
+            this.chargeTimer += dt;
             this.combat.attack(this.player, this.enemies, this.input, this.dungeon);
+
+            // Show charge indicator
+            if (this.chargeTimer > 0.5) {
+                // Charge particles around player
+                if (Math.random() < 0.3) {
+                    const angle = Utils.rand(0, Math.PI * 2);
+                    particles.add(new Particle(
+                        this.player.x + Math.cos(angle) * 20,
+                        this.player.y + Math.sin(angle) * 20, {
+                        vx: -Math.cos(angle) * 2,
+                        vy: -Math.sin(angle) * 2,
+                        life: 0.2, size: 2, endSize: 0,
+                        color: '#ffd740', glow: true, glowSize: 6,
+                    }));
+                }
+            }
+        } else {
+            // Release charge attack
+            if (this.chargeTimer > 0.8 && this.player.weapons.length > 0) {
+                const weapon = this.player.weapons[this.player.currentWeapon];
+                const chargeMult = Math.min(this.chargeTimer / 0.8, 3); // Up to 3x damage
+
+                // Charged melee swing
+                for (const enemy of this.enemies) {
+                    if (!enemy.alive) continue;
+                    const dist = Utils.dist(this.player.x, this.player.y, enemy.x, enemy.y);
+                    if (dist < weapon.range * 1.5) {
+                        const dmg = Math.floor(weapon.getDamage(this.player.attack, false) * chargeMult);
+                        enemy.takeDamage(dmg, this.player.x, this.player.y);
+                        this.combat.addDamageNumber(enemy.x, enemy.y - 20, dmg, true);
+                        particles.hitSpark(enemy.x, enemy.y, '#ffd740', 15);
+                        this.player.addCombo();
+                    }
+                }
+
+                Utils.addShake(8 * chargeMult);
+                Utils.addFlash('#ffd740', 0.2);
+                if (this.vfx && chargeMult >= 2) {
+                    this.vfx.critSlash(this.player.facing);
+                }
+                GameAudio.play('attack');
+
+                // Charged swing visual
+                this.combat.swingVisuals.push({
+                    x: this.player.x, y: this.player.y,
+                    angle: this.player.facing,
+                    range: weapon.range * 1.5,
+                    arc: Math.PI * 1.2,
+                    color: '#ffd740',
+                    life: 0.3, maxLife: 0.3,
+                });
+            }
+            this.chargeTimer = 0;
         }
 
         // Enemies
@@ -1255,6 +1310,11 @@ class Game {
             if (this.saveSystem) this.saveSystem.drawSaveIndicator(ctx, w);
             // Tutorial
             if (this.tutorial) this.tutorial.draw(ctx, w, h);
+        }
+
+        // ---- Danger indicators ----
+        if (this.state === 'playing') {
+            this.ui.drawDangerIndicator(ctx, w, h, this.player, this.enemies);
         }
 
         // ---- Crosshair ----

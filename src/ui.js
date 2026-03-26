@@ -298,14 +298,28 @@ class GameUI {
     }
 
     drawMinimap(ctx, dungeon, player, canvasW, canvasH, enemies) {
-        const mapSize = 120;
-        const mx = canvasW - mapSize - 15;
-        const my = canvasH - mapSize - 15;
+        const mapSize = 130;
+        const mx = canvasW - mapSize - 12;
+        const my = canvasH - mapSize - 12;
         const scale = mapSize / Math.max(dungeon.width, dungeon.height);
 
-        ctx.fillStyle = 'rgba(0,0,0,0.6)';
+        // Track explored tiles (fog of war)
+        if (!dungeon._explored) dungeon._explored = {};
+        const ptx = Math.floor(player.x / TILE_SIZE);
+        const pty = Math.floor(player.y / TILE_SIZE);
+        const revealRadius = 8;
+        for (let dy = -revealRadius; dy <= revealRadius; dy++) {
+            for (let dx = -revealRadius; dx <= revealRadius; dx++) {
+                const ex = ptx + dx, ey = pty + dy;
+                if (ex >= 0 && ex < dungeon.width && ey >= 0 && ey < dungeon.height) {
+                    dungeon._explored[`${ex},${ey}`] = true;
+                }
+            }
+        }
+
+        ctx.fillStyle = 'rgba(0,0,0,0.7)';
         ctx.fillRect(mx - 2, my - 2, mapSize + 4, mapSize + 4);
-        ctx.strokeStyle = '#333';
+        ctx.strokeStyle = '#263238';
         ctx.strokeRect(mx - 2, my - 2, mapSize + 4, mapSize + 4);
 
         for (let y = 0; y < dungeon.height; y++) {
@@ -313,11 +327,15 @@ class GameUI {
                 const tile = dungeon.tiles[y][x];
                 if (tile === TILE.VOID) continue;
 
+                const explored = dungeon._explored[`${x},${y}`];
+                if (!explored) continue; // Fog of war
+
                 let color;
                 switch (tile) {
                     case TILE.WALL: color = '#3a3a4a'; break;
                     case TILE.STAIRS_DOWN: color = '#4a90d9'; break;
                     case TILE.CHEST: color = '#ffd740'; break;
+                    case TILE.WATER: color = '#1a3a5a'; break;
                     default: color = '#1a1a2a'; break;
                 }
 
@@ -326,23 +344,55 @@ class GameUI {
             }
         }
 
-        // Enemy positions
+        // Enemy positions (only show nearby or in explored areas)
         if (enemies) {
             for (const enemy of enemies) {
                 if (!enemy.alive) continue;
+                const etx = Math.floor(enemy.x / TILE_SIZE);
+                const ety = Math.floor(enemy.y / TILE_SIZE);
+                if (!dungeon._explored[`${etx},${ety}`]) continue;
+
                 const ex = mx + (enemy.x / TILE_SIZE) * scale;
                 const ey = my + (enemy.y / TILE_SIZE) * scale;
-                ctx.fillStyle = enemy.isBoss ? '#ff1744' : '#ff5252';
-                const eSize = enemy.isBoss ? 3 : 1.5;
+                ctx.fillStyle = enemy.isBoss ? '#ff1744' : enemy.isElite ? '#ff9800' : '#ff5252';
+                const eSize = enemy.isBoss ? 3.5 : enemy.isElite ? 2.5 : 1.5;
                 ctx.fillRect(ex - eSize / 2, ey - eSize / 2, eSize, eSize);
             }
         }
 
-        // Player position
+        // Player position (pulsing)
         const px = mx + (player.x / TILE_SIZE) * scale;
         const py = my + (player.y / TILE_SIZE) * scale;
+        const pulse = Math.sin(Date.now() * 0.006) * 0.5 + 1.5;
         ctx.fillStyle = '#4fc3f7';
-        ctx.fillRect(px - 2, py - 2, 4, 4);
+        ctx.fillRect(px - pulse, py - pulse, pulse * 2, pulse * 2);
+    }
+
+    // Enemy proximity danger indicator
+    drawDangerIndicator(ctx, w, h, player, enemies) {
+        if (!enemies) return;
+        for (const enemy of enemies) {
+            if (!enemy.alive) continue;
+            const dist = Utils.dist(player.x, player.y, enemy.x, enemy.y);
+            if (dist > 120 && dist < 250) {
+                // Off-screen enemy indicator
+                const angle = Utils.angle(player.x, player.y, enemy.x, enemy.y);
+                const edgeX = w / 2 + Math.cos(angle) * Math.min(w, h) * 0.38;
+                const edgeY = h / 2 + Math.sin(angle) * Math.min(w, h) * 0.38;
+
+                ctx.save();
+                ctx.translate(edgeX, edgeY);
+                ctx.rotate(angle);
+                ctx.fillStyle = enemy.isBoss ? 'rgba(255,23,68,0.5)' : 'rgba(255,82,82,0.2)';
+                ctx.beginPath();
+                ctx.moveTo(8, 0);
+                ctx.lineTo(-4, -5);
+                ctx.lineTo(-4, 5);
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+            }
+        }
     }
 
     drawTitleScreen(ctx, w, h) {
