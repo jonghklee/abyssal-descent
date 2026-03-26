@@ -292,7 +292,7 @@ class Codex {
     }
 
     getRelicEntries() {
-        return RELIC_POOL.map(relic => {
+        const entries = RELIC_POOL.map(relic => {
             const data = this.data.relics[relic.id];
             return {
                 found: !!data,
@@ -302,5 +302,21 @@ class Codex {
                 color: GACHA_RARITIES[relic.rarity]?.color || '#78909c',
             };
         });
+
+        // Add synergies section
+        if (typeof SYNERGY_DEFS !== 'undefined') {
+            for (const syn of SYNERGY_DEFS) {
+                const activated = typeof game !== 'undefined' && game.synergySystem &&
+                    game.synergySystem.activeSynergies.find(s => s.id === syn.id);
+                entries.push({
+                    found: !!activated,
+                    name: syn.name,
+                    icon: activated ? syn.icon : '??',
+                    detail: activated ? `SYNERGY: ${syn.desc}` : 'Combine 2 relics...',
+                    color: syn.color,
+                });
+            }
+        }
+        return entries;
     }
 }
