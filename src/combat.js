@@ -579,6 +579,27 @@ class CombatSystem {
                 }));
             }
         }
+        // Bat: wing fragments flutter down
+        if (enemy.type === 'bat') {
+            for (let i = 0; i < 4; i++) {
+                particles.add(new Particle(enemy.x + Utils.rand(-8,8), enemy.y, {
+                    life: 0.8, size: Utils.rand(2,4), endSize: 1,
+                    color: '#ce93d8', gravity: 0.08, friction: 0.98,
+                    vx: Utils.rand(-2,2), vy: Utils.rand(-1,1),
+                    shape: 'square', rotSpeed: Utils.rand(-4,4),
+                }));
+            }
+        }
+        // Zombie: green gas cloud
+        if (enemy.type === 'zombie') {
+            for (let i = 0; i < 5; i++) {
+                particles.add(new Particle(enemy.x + Utils.rand(-6,6), enemy.y + Utils.rand(-4,4), {
+                    life: 0.6, size: Utils.rand(4,8), endSize: 12,
+                    color: 'rgba(85,139,47,0.25)',
+                    vx: Utils.rand(-1,1), vy: Utils.rand(-1.5,-0.3),
+                }));
+            }
+        }
         // Ghost fades with ethereal wisps
         if (enemy.type === 'ghost') {
             for (let i = 0; i < 8; i++) {
