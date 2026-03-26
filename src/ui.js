@@ -388,11 +388,15 @@ class GameUI {
 
         // Menu options
         const menuY = h * 0.55;
+        const hasSave = typeof game !== 'undefined' && game.saveSystem && game.saveSystem.hasSave;
         const menuItems = [
             { text: '[ 1 ] New Run', color: '#64ffda' },
             { text: '[ 2 ] Daily Challenge', color: '#ffd740' },
             { text: '[ 3 ] Soul Forge', color: '#b388ff' },
         ];
+        if (hasSave) {
+            menuItems.push({ text: '[ 4 ] Continue', color: '#4caf50' });
+        }
 
         for (let i = 0; i < menuItems.length; i++) {
             const item = menuItems[i];

@@ -88,6 +88,14 @@ class Game {
                     this.ui.notify('Daily Challenge Active!', '#ffd740', 3);
                 } else if (e.code === 'Digit3') {
                     this.state = 'soulforge';
+                } else if (e.code === 'Digit4' && this.saveSystem && this.saveSystem.hasSave) {
+                    // Continue from save
+                    this.startGame();
+                    const saveData = this.saveSystem.load();
+                    if (saveData) {
+                        this.saveSystem.restoreGame(this, saveData);
+                        this.ui.notify('Game loaded!', '#64ffda', 2);
+                    }
                 }
                 return;
             }
@@ -232,6 +240,7 @@ class Game {
         this.luckWheel = new LuckWheel();
         this.floorMods = new FloorModSystem();
         this.goblinManager = new GoblinManager();
+        this.saveSystem = new SaveSystem();
 
         // Apply meta-progression bonuses
         this.meta.applyToPlayer(this.player);
@@ -891,6 +900,9 @@ class Game {
         this.camera.x += (this.camera.targetX - this.camera.x) * this.camera.smoothing;
         this.camera.y += (this.camera.targetY - this.camera.y) * this.camera.smoothing;
 
+        // Auto-save
+        if (this.saveSystem) this.saveSystem.update(dt, this);
+
         // Player death
         if (!this.player.alive) {
             // Phoenix Feather revive check
@@ -913,6 +925,9 @@ class Game {
                 Utils.addShake(15);
                 Utils.addSlowMo(0.1, 1.5);
                 particles.explosion(this.player.x, this.player.y, '#ff1744', 50);
+
+                // Delete run save on death (roguelike permadeath)
+                if (this.saveSystem) this.saveSystem.deleteSave();
 
                 // Meta-progression: earn souls
                 if (this.meta) {
@@ -1118,6 +1133,8 @@ class Game {
                 ctx.font = 'bold 10px monospace';
                 ctx.fillText(`ASCENSION ${this.ascension.level}`, w - 20, 135);
             }
+            // Save indicator
+            if (this.saveSystem) this.saveSystem.drawSaveIndicator(ctx, w);
         }
 
         // ---- Crosshair ----
