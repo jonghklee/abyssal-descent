@@ -241,6 +241,7 @@ class Game {
         this.floorMods = new FloorModSystem();
         this.goblinManager = new GoblinManager();
         this.saveSystem = new SaveSystem();
+        this.tutorial = new Tutorial();
 
         // Apply meta-progression bonuses
         this.meta.applyToPlayer(this.player);
@@ -259,6 +260,12 @@ class Game {
 
         // Start ambient music
         GameAudio.startAmbience();
+
+        // Tutorial
+        if (this.tutorial) {
+            this.tutorial.start();
+            this.tutorial.trigger('start');
+        }
 
         this.generateFloor();
     }
@@ -915,6 +922,19 @@ class Game {
         this.camera.x += (this.camera.targetX - this.camera.x) * this.camera.smoothing;
         this.camera.y += (this.camera.targetY - this.camera.y) * this.camera.smoothing;
 
+        // Tutorial
+        if (this.tutorial && this.tutorial.active) {
+            this.tutorial.update(dt);
+            // Auto-trigger based on player state
+            if (Math.abs(this.player.vx) > 0 || Math.abs(this.player.vy) > 0) {
+                this.tutorial.trigger('move');
+            }
+            if (this.player.kills >= 1) this.tutorial.trigger('firstKill');
+            if (this.player.level >= 2) this.tutorial.trigger('perkDone');
+            if (this.player.isDashing) this.tutorial.trigger('dash');
+            if (this.floor >= 2) this.tutorial.trigger('floor2');
+        }
+
         // Auto-save
         if (this.saveSystem) this.saveSystem.update(dt, this);
 
@@ -1165,6 +1185,8 @@ class Game {
             }
             // Save indicator
             if (this.saveSystem) this.saveSystem.drawSaveIndicator(ctx, w);
+            // Tutorial
+            if (this.tutorial) this.tutorial.draw(ctx, w, h);
         }
 
         // ---- Crosshair ----

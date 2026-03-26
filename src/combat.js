@@ -579,5 +579,34 @@ class CombatSystem {
         }
 
         ctx.restore();
+
+        // Weapon enchant particles (trail effect on weapon tip)
+        if (weapon.isSwinging && weapon.enchantPrefix) {
+            const tipDist = weapon.weaponType === 'melee' ? weapon.range * 0.8 : 30;
+            const tipX = player.x + Math.cos(player.facing + weapon.swingAngle) * tipDist;
+            const tipY = player.y + Math.sin(player.facing + weapon.swingAngle) * tipDist;
+
+            const effectColors = {
+                'Blazing': ['#ff6d00', '#ff3d00', '#ffab00'],
+                'Frozen': ['#4fc3f7', '#81d4fa', '#b3e5fc'],
+                'Venomous': ['#66bb6a', '#43a047', '#a5d6a7'],
+                'Vampiric': ['#e91e63', '#f48fb1', '#ff1744'],
+                'Thunder': ['#ffeb3b', '#fff176', '#fff9c4'],
+                'Holy': ['#fff9c4', '#fff176', '#ffffff'],
+                'Void': ['#7c4dff', '#b388ff', '#ea80fc'],
+                'Bloodthirst': ['#d50000', '#ff1744', '#ff5252'],
+            };
+            const colors = effectColors[weapon.enchantPrefix.name] || ['#fff'];
+            particles.add(new Particle(tipX + Utils.rand(-3, 3), tipY + Utils.rand(-3, 3), {
+                life: Utils.rand(0.1, 0.3),
+                size: Utils.rand(1, 3),
+                endSize: 0,
+                color: Utils.randChoice(colors),
+                glow: true,
+                glowSize: 6,
+                vx: Utils.rand(-1, 1),
+                vy: Utils.rand(-1, 1),
+            }));
+        }
     }
 }

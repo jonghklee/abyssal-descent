@@ -222,13 +222,35 @@ const GameAudio = {
     ambienceLoop() {
         if (!this.ambiencePlaying) return;
 
-        // Random eerie note
-        const notes = [110, 130.81, 146.83, 164.81, 196, 220, 246.94];
+        // Biome-aware note selection
+        let notes = [110, 130.81, 146.83, 164.81, 196, 220, 246.94]; // Default: crypt (minor)
+        let waveType = 'sine';
+        if (typeof game !== 'undefined' && game.biomeSystem && game.biomeSystem.current) {
+            const biome = game.biomeSystem.current.id;
+            switch (biome) {
+                case 'inferno':
+                    notes = [82.41, 98, 110, 130.81, 146.83, 164.81]; // Low, ominous
+                    waveType = 'triangle';
+                    break;
+                case 'void':
+                    notes = [196, 233.08, 261.63, 293.66, 349.23, 392]; // High, ethereal
+                    waveType = 'sine';
+                    break;
+                case 'abyss':
+                    notes = [55, 65.41, 73.42, 82.41, 98, 110]; // Very low, dread
+                    waveType = 'sawtooth';
+                    break;
+                case 'heaven':
+                    notes = [261.63, 329.63, 392, 440, 523.25, 659.25]; // Bright, major
+                    waveType = 'sine';
+                    break;
+            }
+        }
         const note = notes[Math.floor(Math.random() * notes.length)];
         const t = this.ctx.currentTime;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
-        osc.type = 'sine';
+        osc.type = waveType;
         osc.frequency.value = note;
         gain.gain.setValueAtTime(0, t);
         gain.gain.linearRampToValueAtTime(0.02, t + 1);
