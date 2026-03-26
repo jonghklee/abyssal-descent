@@ -472,7 +472,16 @@ class CombatSystem {
             game.dailyChallenge.addScore(points);
         }
         const goldMult = player.goldMultiplier || 1;
-        player.gold += Math.floor(enemy.goldReward * goldMult);
+        const goldEarned = Math.floor(enemy.goldReward * goldMult);
+        player.gold += goldEarned;
+        // Show gold earned for elite+ kills
+        if ((enemy.isElite || enemy.isBoss || enemy.isGolden) && goldEarned > 0 && typeof game !== 'undefined') {
+            this.damageNumbers.push({
+                x: enemy.x + 15, y: enemy.y,
+                text: `+${goldEarned}g`, color: '#ffd740',
+                size: 11, life: 1.0, vy: -1.5, isCrit: false,
+            });
+        }
         player.kills++;
 
         // Kill milestone announcements + secret weapon at 1000
