@@ -260,8 +260,10 @@ const GameAudio = {
         osc.start(t);
         osc.stop(t + 3);
 
-        // Schedule next note
-        setTimeout(() => this.ambienceLoop(), Utils.rand(2000, 5000));
+        // Schedule next note — faster during boss fights
+        const inBossRoom = typeof game !== 'undefined' && game.lastRoom && game.lastRoom.type === 'boss';
+        const interval = inBossRoom ? Utils.rand(500, 1500) : Utils.rand(2000, 5000);
+        setTimeout(() => this.ambienceLoop(), interval);
     },
 
     stopAmbience() {

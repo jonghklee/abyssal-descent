@@ -540,13 +540,20 @@ class CombatSystem {
     }
 
     addDamageNumber(x, y, damage, isCrit) {
+        const dmgNum = typeof damage === 'number' ? damage : 0;
+        // Scale size with damage (bigger hits = bigger numbers)
+        let baseSize = isCrit ? 18 : 14;
+        if (dmgNum > 100) baseSize = 24;
+        else if (dmgNum > 50) baseSize = 20;
+        else if (dmgNum > 25) baseSize = 17;
+
         this.damageNumbers.push({
             x: x + Utils.rand(-10, 10),
             y: y,
             text: damage.toString(),
-            color: isCrit ? '#ffeb3b' : '#ff5252',
-            size: isCrit ? 18 : 14,
-            life: 1.0,
+            color: isCrit ? '#ffeb3b' : dmgNum > 50 ? '#ff9800' : '#ff5252',
+            size: baseSize,
+            life: dmgNum > 50 ? 1.3 : 1.0,
             vy: -2,
             isCrit,
         });

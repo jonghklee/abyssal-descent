@@ -312,6 +312,7 @@ class Game {
         this.combat.swingVisuals = [];
         particles.clear();
         this.openedChests = new Set();
+        this._floorCleared = false;
 
         // Generate dungeon
         const mapW = 60 + this.floor * 5;
@@ -972,6 +973,15 @@ class Game {
 
         // Pet system
         if (this.petSystem) this.petSystem.update(dt, this.player, this.enemies, this.dungeon);
+
+        // Floor clear bonus (all enemies dead)
+        if (!this._floorCleared && this.enemies.filter(e => e.alive && !e.isAlly).length === 0) {
+            this._floorCleared = true;
+            const bonus = 20 + this.floor * 5;
+            this.player.gold += bonus;
+            this.ui.notify(`Floor ${this.floor} Cleared! +${bonus}g`, '#64ffda', 3);
+            particles.levelUpEffect(this.player.x, this.player.y);
+        }
 
         // Floor modifier update
         if (this.floorMods) this.floorMods.update(dt);
