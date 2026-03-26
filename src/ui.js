@@ -589,6 +589,7 @@ class GameUI {
                 { icon: '💰', label: 'Gold', value: Math.floor(player.gold), color: '#ffd740' },
                 { icon: '🔗', label: 'Best Combo', value: player.maxCombo, color: '#ff4081' },
                 { icon: '🎒', label: 'Relics', value: player.relics ? player.relics.length : 0, color: '#b388ff' },
+                { icon: '⏱', label: 'Time', value: typeof game !== 'undefined' ? `${Math.floor(game.playTime/60)}m ${Math.floor(game.playTime%60)}s` : '?', color: '#78909c' },
             ];
 
             for (let i = 0; i < stats.length; i++) {

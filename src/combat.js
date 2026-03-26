@@ -446,6 +446,14 @@ class CombatSystem {
         player.gold += enemy.goldReward;
         player.kills++;
 
+        // First kill celebration
+        if (typeof game !== 'undefined' && !game.firstKillDone && player.kills === 1) {
+            game.firstKillDone = true;
+            Utils.addSlowMo(0.2, 0.8);
+            Utils.addFreeze(6);
+            if (game.vfx) game.vfx.critSlash(Utils.angle(player.x, player.y, enemy.x, enemy.y));
+        }
+
         // Type-specific death effects
         const deathColors = {
             slime: '#66bb6a', skeleton: '#e0e0e0', bat: '#ce93d8',

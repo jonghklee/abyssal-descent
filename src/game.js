@@ -267,6 +267,10 @@ class Game {
         this.codex = new Codex();
         this.classSelect = new ClassSelect();
 
+        // Play timer
+        this.playTime = 0;
+        this.firstKillDone = false;
+
         // Meta bonuses: applied after class selection (in classes.js)
         // For save/load (skipClassSelect), apply here
         if (skipClassSelect && this.meta) {
@@ -1250,6 +1254,9 @@ class Game {
             if (this.floor >= 2) this.tutorial.trigger('floor2');
         }
 
+        // Play time
+        this.playTime += dt;
+
         // Auto-save
         if (this.saveSystem) this.saveSystem.update(dt, this);
 
@@ -1811,7 +1818,9 @@ class Game {
             ctx.fillStyle = '#78909c';
             ctx.font = '14px monospace';
             ctx.fillText(`Floor ${this.floor} | ${this.player.className || 'Adventurer'} Lv.${this.player.level}`, w / 2, h * 0.42);
-            ctx.fillText(`Kills: ${this.player.kills} | Gold: ${Math.floor(this.player.gold)}`, w / 2, h * 0.47);
+            const mins = Math.floor(this.playTime / 60);
+            const secs = Math.floor(this.playTime % 60);
+            ctx.fillText(`Kills: ${this.player.kills} | Gold: ${Math.floor(this.player.gold)} | Time: ${mins}m ${secs}s`, w / 2, h * 0.47);
             ctx.fillStyle = '#546e7a';
             ctx.font = '12px monospace';
             ctx.fillText('[ESC] Resume  |  [C] Codex', w / 2, h * 0.58);
