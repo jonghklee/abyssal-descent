@@ -115,7 +115,13 @@ class Codex {
             ctx.fillRect(tx, 85, tabW - 5, 25);
             ctx.fillStyle = isActive ? '#64ffda' : '#546e7a';
             ctx.font = isActive ? 'bold 11px monospace' : '11px monospace';
-            ctx.fillText(this.tabs[i], tx + tabW / 2, 102);
+            const counts = [
+                `${Object.keys(this.data.enemies).length}/${Object.keys(ENEMY_TYPES).length}`,
+                `${Object.keys(this.data.weapons).length}/${Object.keys(WEAPON_TYPES).length * 5}`,
+                `${Object.keys(this.data.pets).length}/${PET_DEFS.length}`,
+                `${Object.keys(this.data.relics).length}/${RELIC_POOL.length}`,
+            ];
+            ctx.fillText(`${this.tabs[i]} (${counts[i]})`, tx + tabW / 2, 102);
         }
 
         // Content area

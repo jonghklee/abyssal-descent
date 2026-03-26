@@ -106,8 +106,11 @@ class Game {
                     if (e.code === `Digit${i + 1}`) {
                         const ids = ['startHp','startAtk','startDef','startPotions','startSpeed','luckBoost','xpBoost','goldBoost'];
                         if (this.meta.buyUpgrade(ids[i])) {
-                            this.ui.notify('Upgrade purchased!', '#b388ff');
-                            GameAudio.play('pickup');
+                            this.ui.notify(`Upgrade purchased! (Lv.${this.meta.data.upgrades[ids[i]]})`, '#b388ff');
+                            GameAudio.play('levelUp');
+                            Utils.addFlash('#b388ff', 0.15);
+                        } else {
+                            this.ui.notify('Not enough souls!', '#546e7a');
                         }
                     }
                 }
