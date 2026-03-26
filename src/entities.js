@@ -273,10 +273,13 @@ class Player extends Entity {
             ctx.globalAlpha = 0.5 + Math.sin(this.flashTimer * 30) * 0.5;
         }
 
-        // Dash ghost effect
+        // Dash ghost effect + invulnerability shimmer
         if (this.isDashing) {
             ctx.shadowBlur = 20;
             ctx.shadowColor = '#64ffda';
+        } else if (this.invulnerable > 0 && !this.flashTimer) {
+            // Post-dash/revive invulnerability shimmer
+            ctx.globalAlpha = 0.6 + Math.sin(Date.now() * 0.02) * 0.3;
         }
 
         // Body
@@ -632,9 +635,13 @@ class Enemy extends Entity {
         if (this.state === 'preparing') {
             this.vx *= 0.8;
             this.vy *= 0.8;
+            // Telegraph: warning indicator
+            this._telegraphing = true;
+            this._telegraphAngle = Utils.angle(this.x, this.y, player.x, player.y);
             if (this.stateTimer > 0.8) {
                 this.state = 'charging';
                 this.stateTimer = 0;
+                this._telegraphing = false;
                 const angle = Utils.angle(this.x, this.y, player.x, player.y);
                 this.vx = Math.cos(angle) * this.speed * 5;
                 this.vy = Math.sin(angle) * this.speed * 5;
@@ -879,6 +886,32 @@ class Enemy extends Entity {
             ctx.font = 'bold 10px monospace';
             ctx.textAlign = 'center';
             ctx.fillText(this.name, this.x, this.y - this.h - 10);
+        }
+
+        // Attack telegraph indicator (red line showing charge direction)
+        if (this._telegraphing) {
+            ctx.save();
+            ctx.strokeStyle = 'rgba(255,23,68,0.4)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.moveTo(this.x, this.y);
+            ctx.lineTo(
+                this.x + Math.cos(this._telegraphAngle) * 80,
+                this.y + Math.sin(this._telegraphAngle) * 80
+            );
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Warning "!" icon
+            const blink = Math.sin(Date.now() * 0.015) > 0;
+            if (blink) {
+                ctx.fillStyle = '#ff1744';
+                ctx.font = 'bold 12px monospace';
+                ctx.textAlign = 'center';
+                ctx.fillText('!', this.x, this.y - this.h - 5);
+            }
+            ctx.restore();
         }
     }
 

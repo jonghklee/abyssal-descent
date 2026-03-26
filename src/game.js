@@ -1188,7 +1188,25 @@ class Game {
                 if (this.curseSystem) this.curseSystem.offerActive = false;
                 this.weaponPickup = null;
                 Utils.addSlowMo(0.1, 1.5);
+                // Death explosion with player-colored particles
                 particles.explosion(this.player.x, this.player.y, '#ff1744', 50);
+                particles.explosion(this.player.x, this.player.y, this.player.classColor || '#4fc3f7', 30);
+                // Equipment scatter
+                for (let i = 0; i < 8; i++) {
+                    const angle = (i / 8) * Math.PI * 2;
+                    particles.add(new Particle(this.player.x, this.player.y, {
+                        vx: Math.cos(angle) * Utils.rand(2, 6),
+                        vy: Math.sin(angle) * Utils.rand(2, 6),
+                        life: Utils.rand(0.5, 1.5),
+                        size: Utils.rand(3, 6),
+                        endSize: 0,
+                        color: Utils.randChoice(['#78909c', '#546e7a', '#b0bec5']),
+                        gravity: 0.15,
+                        friction: 0.96,
+                        shape: 'square',
+                        rotSpeed: Utils.rand(-5, 5),
+                    }));
+                }
 
                 // Delete run save on death (roguelike permadeath)
                 if (this.saveSystem) this.saveSystem.deleteSave();
