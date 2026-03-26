@@ -385,6 +385,20 @@ class MetaProgression {
         ctx.textAlign = 'center';
         ctx.fillText(`Total Runs: ${this.data.totalRuns} | Best Floor: ${this.data.bestFloor} | Total Kills: ${this.data.totalKills}`, w / 2, statsY);
 
+        // Milestone unlocks display
+        const unlocks = this.data.unlocks || {};
+        const unlockList = [];
+        if (unlocks.bonusAtk) unlockList.push(`+${unlocks.bonusAtk} ATK`);
+        if (unlocks.bonusHp) unlockList.push(`+${unlocks.bonusHp} HP`);
+        if (unlocks.bonusDef) unlockList.push(`+${unlocks.bonusDef} DEF`);
+        if (unlocks.startGold) unlockList.push(`+${unlocks.startGold}g`);
+        if (unlocks.startRarity) unlockList.push(`${unlocks.startRarity} wpn`);
+        if (unlockList.length > 0) {
+            ctx.fillStyle = '#4caf50';
+            ctx.font = '9px monospace';
+            ctx.fillText(`Milestone Bonuses: ${unlockList.join(' | ')}`, w / 2, statsY + 16);
+        }
+
         // Continue
         ctx.fillStyle = '#78909c';
         ctx.font = 'bold 14px monospace';
