@@ -658,6 +658,7 @@ class GameUI {
             if (player._lastStandUsed) highlights.push('Last Stand!');
             if (player.relics && player.relics.length >= 5) highlights.push(`${player.relics.length} relics!`);
             if (typeof game !== 'undefined' && game.killStreak?.bestStreak >= 10) highlights.push(`${game.killStreak.bestStreak} streak!`);
+            if (player._maxHit >= 50) highlights.push(`${player._maxHit} max hit!`);
             if (highlights.length > 0) {
                 ctx.fillStyle = '#546e7a';
                 ctx.font = '9px monospace';

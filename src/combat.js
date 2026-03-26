@@ -630,6 +630,12 @@ class CombatSystem {
 
     addDamageNumber(x, y, damage, isCrit) {
         const dmgNum = typeof damage === 'number' ? damage : 0;
+        // Track max hit for run highlights
+        if (typeof game !== 'undefined' && game.player) {
+            if (!game.player._maxHit || dmgNum > game.player._maxHit) {
+                game.player._maxHit = dmgNum;
+            }
+        }
         // Scale size with damage (bigger hits = bigger numbers)
         let baseSize = isCrit ? 18 : 14;
         if (dmgNum > 100) baseSize = 24;
