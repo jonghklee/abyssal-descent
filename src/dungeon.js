@@ -138,6 +138,8 @@ class DungeonGenerator {
 
         if (shuffled.length > 0) shuffled[0].type = 'treasure';
         if (shuffled.length > 2) shuffled[2].type = 'shrine';
+        if (shuffled.length > 4 && Math.random() < 0.3) shuffled[4].type = 'secret';
+        if (shuffled.length > 5 && Math.random() < 0.4) shuffled[5].type = 'miniboss';
 
         // Boss room on certain floors
         if (this.floor % 5 === 0 && this.rooms.length > 2) {
@@ -173,6 +175,34 @@ class DungeonGenerator {
                         this.tiles[y][x] = TILE.WATER;
                     }
                 }
+            }
+        }
+
+        if (room.type === 'secret') {
+            // Secret room: multiple chests + gold
+            this.tiles[room.centerY][room.centerX] = TILE.CHEST;
+            if (room.w >= 6) {
+                this.tiles[room.centerY][room.centerX - 2] = TILE.CHEST;
+                this.tiles[room.centerY][room.centerX + 2] = TILE.CHEST;
+            }
+            // Decorative pillars
+            if (room.w >= 7 && room.h >= 7) {
+                this.tiles[room.y + 1][room.x + 1] = TILE.PILLAR;
+                this.tiles[room.y + 1][room.x + room.w - 2] = TILE.PILLAR;
+                this.tiles[room.y + room.h - 2][room.x + 1] = TILE.PILLAR;
+                this.tiles[room.y + room.h - 2][room.x + room.w - 2] = TILE.PILLAR;
+            }
+        }
+
+        if (room.type === 'miniboss') {
+            // Miniboss room: pillars for cover
+            if (room.w >= 8 && room.h >= 8) {
+                const mx = room.x + Math.floor(room.w / 3);
+                const my = room.y + Math.floor(room.h / 3);
+                this.tiles[my][mx] = TILE.PILLAR;
+                this.tiles[my][mx + Math.floor(room.w / 3)] = TILE.PILLAR;
+                this.tiles[my + Math.floor(room.h / 3)][mx] = TILE.PILLAR;
+                this.tiles[my + Math.floor(room.h / 3)][mx + Math.floor(room.w / 3)] = TILE.PILLAR;
             }
         }
     }

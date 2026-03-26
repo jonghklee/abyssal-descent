@@ -360,6 +360,37 @@ class Game {
                 continue;
             }
 
+            if (room.type === 'secret') {
+                // Secret rooms: no enemies, just loot
+                continue;
+            }
+
+            if (room.type === 'miniboss') {
+                // Miniboss room: one strong elite + guards
+                const mbTypes = ['knight', 'zombie', 'mage', 'golem_enemy'];
+                const mbType = Utils.randChoice(mbTypes.filter(t => ENEMY_TYPES[t]));
+                const mx = room.centerX * TILE_SIZE + TILE_SIZE / 2;
+                const my = room.centerY * TILE_SIZE + TILE_SIZE / 2;
+                const miniboss = new Enemy(mx, my, mbType);
+                // Make it a powerful elite
+                const scale = this.getFloorDifficulty() * 2;
+                miniboss.maxHp = Math.floor(miniboss.maxHp * scale);
+                miniboss.hp = miniboss.maxHp;
+                miniboss.baseAttack = Math.floor(miniboss.baseAttack * scale * 0.8);
+                miniboss.xpReward = Math.floor(miniboss.xpReward * 4);
+                miniboss.goldReward = Math.floor(miniboss.goldReward * 4);
+                EventSystem.makeElite(miniboss, this.floor);
+                miniboss.name = '⭐ ' + miniboss.name + ' (Miniboss)';
+                this.enemies.push(miniboss);
+                room.enemies.push(miniboss);
+
+                // Add a few guards
+                for (let j = 0; j < 3; j++) {
+                    this.spawnEnemyInRoom(room, floorEnemies);
+                }
+                continue;
+            }
+
             // Normal rooms
             const count = Utils.randInt(2, 4 + Math.floor(this.floor / 2));
             for (let j = 0; j < count; j++) {
@@ -970,6 +1001,20 @@ class Game {
                 currentRoom.eventTriggered = true;
                 if (this.vfx) this.vfx.bossEntrance();
                 Utils.addShake(8);
+                GameAudio.play('trap');
+            }
+            // Secret room discovery
+            else if (currentRoom.type === 'secret' && !currentRoom.eventTriggered) {
+                currentRoom.eventTriggered = true;
+                this.ui.notify('✨ Secret Room Discovered!', '#ffd740', 3);
+                Utils.addFlash('#ffd740', 0.2);
+                GameAudio.play('chest');
+            }
+            // Miniboss room warning
+            else if (currentRoom.type === 'miniboss' && !currentRoom.eventTriggered) {
+                currentRoom.eventTriggered = true;
+                this.ui.notify('⭐ Miniboss Awaits!', '#ff9800', 3);
+                Utils.addShake(5);
                 GameAudio.play('trap');
             }
             // Normal room events

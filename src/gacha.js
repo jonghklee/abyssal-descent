@@ -104,6 +104,16 @@ const RELIC_POOL = [
       apply: (p) => { p.fullMapReveal = true; } },
     { id: 'souljar', name: 'Soul Jar', desc: '+50% Souls on death', rarity: 'legendary', icon: '🏺',
       apply: (p) => { p.soulBonus = 1.5; } },
+    // Class-specific relics
+    { id: 'warAxe', name: 'Warlord\'s Axe Charm', desc: 'Warrior: +50% AoE, +8 ATK', rarity: 'epic', icon: '🪓',
+      classReq: 'Warrior',
+      apply: (p) => { if (p.className === 'Warrior') { p.attack += 8; } } },
+    { id: 'shadowMask', name: 'Shadow Mask', desc: 'Rogue: +25% Crit, Dash invisible', rarity: 'epic', icon: '🎭',
+      classReq: 'Rogue',
+      apply: (p) => { if (p.className === 'Rogue') { p.critChance += 0.25; } } },
+    { id: 'arcaneOrb', name: 'Arcane Focus Orb', desc: 'Mage: Skills CD -50%, +10 ATK', rarity: 'epic', icon: '🔮',
+      classReq: 'Mage',
+      apply: (p) => { if (p.className === 'Mage') { p.skillCdReduction = 0.5; p.attack += 10; } } },
 ];
 
 class GachaSystem {
