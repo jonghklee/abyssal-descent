@@ -464,7 +464,8 @@ class CombatSystem {
             const points = enemy.isBoss ? 500 : enemy.isElite ? 100 : 10;
             game.dailyChallenge.addScore(points);
         }
-        player.gold += enemy.goldReward;
+        const goldMult = player.goldMultiplier || 1;
+        player.gold += Math.floor(enemy.goldReward * goldMult);
         player.kills++;
 
         // Kill milestone announcements
