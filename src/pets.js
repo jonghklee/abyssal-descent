@@ -329,6 +329,22 @@ class Pet {
             // Boost stats
             if (this.stats.dmg) this.stats.dmg = Math.floor(this.stats.dmg * 1.1);
             if (this.stats.healAmount) this.stats.healAmount++;
+
+            // Pet evolution at level 10!
+            if (this.level === 10 && !this.evolved) {
+                this.evolved = true;
+                this.name = '★ ' + this.name;
+                if (this.stats.dmg) this.stats.dmg = Math.floor(this.stats.dmg * 2);
+                if (this.stats.healAmount) this.stats.healAmount *= 2;
+                if (this.stats.range) this.stats.range = Math.floor(this.stats.range * 1.5);
+                if (typeof game !== 'undefined') {
+                    game.ui.notify(`🌟 ${this.name} EVOLVED! 2x power!`, this.getRarityColor(), 4);
+                    Utils.addShake(10);
+                    Utils.addFlash(this.color, 0.4);
+                    particles.levelUpEffect(this.x, this.y);
+                    GameAudio.play('levelUp');
+                }
+            }
         }
     }
 

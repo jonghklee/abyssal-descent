@@ -1341,9 +1341,19 @@ class Game {
                     }, 2000);
                 }
 
-                // Achievement: perfect room (no damage taken — check if HP is still max)
-                if (this.player.hp === this.player.maxHp && this.achievements) {
-                    this.achievements.addStat('perfectRooms');
+                // Achievement: perfect room (no damage taken)
+                if (this.player.hp === this.player.maxHp) {
+                    if (this.achievements) this.achievements.addStat('perfectRooms');
+                    // Consecutive perfect room streak
+                    if (!this._perfectStreak) this._perfectStreak = 0;
+                    this._perfectStreak++;
+                    if (this._perfectStreak >= 2) {
+                        const streakBonus = this._perfectStreak * 10;
+                        this.player.gold += streakBonus;
+                        this.ui.notify(`Flawless x${this._perfectStreak}! +${streakBonus}g`, '#64ffda', 2);
+                    }
+                } else {
+                    this._perfectStreak = 0;
                 }
             }
         }
