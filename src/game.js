@@ -1140,6 +1140,11 @@ class Game {
                 if (this.vfx) this.vfx.bossEntrance();
                 Utils.addShake(8);
                 GameAudio.play('trap');
+                // First boss tip
+                if (!this._bossSeenBefore) {
+                    this._bossSeenBefore = true;
+                    this.ui.notify('TIP: Use [SPACE] to dash through attacks!', '#78909c', 5);
+                }
             }
             // Secret room discovery
             else if (currentRoom.type === 'secret' && !currentRoom.eventTriggered) {

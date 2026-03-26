@@ -178,15 +178,26 @@ class GameUI {
 
         // ---- Potions (bottom left) ----
         const potY = h - 50;
+        const lowHp = player.hp / player.maxHp < 0.3 && player.potions > 0;
         ctx.textAlign = 'left';
-        ctx.fillStyle = 'rgba(0,0,0,0.5)';
-        ctx.fillRect(18, potY - 2, 80, 30);
-        ctx.fillStyle = '#66bb6a';
-        ctx.font = '12px monospace';
+        // Flash potion UI when low HP
+        if (lowHp) {
+            const flash = Math.sin(Date.now() * 0.01) > 0;
+            ctx.fillStyle = flash ? 'rgba(244,67,54,0.4)' : 'rgba(0,0,0,0.5)';
+            ctx.strokeStyle = '#f44336';
+            ctx.lineWidth = 1;
+            ctx.fillRect(18, potY - 2, 80, 30);
+            ctx.strokeRect(18, potY - 2, 80, 30);
+        } else {
+            ctx.fillStyle = 'rgba(0,0,0,0.5)';
+            ctx.fillRect(18, potY - 2, 80, 30);
+        }
+        ctx.fillStyle = lowHp ? '#ff5252' : '#66bb6a';
+        ctx.font = lowHp ? 'bold 12px monospace' : '12px monospace';
         ctx.fillText(`🧪 x${player.potions}`, 24, potY + 14);
-        ctx.fillStyle = '#546e7a';
+        ctx.fillStyle = lowHp ? '#ff8a80' : '#546e7a';
         ctx.font = '9px monospace';
-        ctx.fillText('[Q]', 24, potY + 24);
+        ctx.fillText(lowHp ? '[Q] HEAL!' : '[Q]', 24, potY + 24);
 
         // ---- Weapon info (bottom center) ----
         if (player.weapons.length > 0) {
