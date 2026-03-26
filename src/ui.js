@@ -482,6 +482,9 @@ class GameUI {
         ctx.font = '14px monospace';
         ctx.fillStyle = '#546e7a';
         ctx.fillText('A Roguelike Dungeon Crawler', w / 2, titleY + 85);
+        ctx.font = '10px monospace';
+        ctx.fillStyle = '#37474f';
+        ctx.fillText('4 Classes · Infinite Floors · 20+ Relics · Gacha · Pets · Forge · Daily Challenge', w / 2, titleY + 102);
 
         // Menu options
         const menuY = h * 0.55;
