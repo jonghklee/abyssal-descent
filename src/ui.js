@@ -378,9 +378,10 @@ class GameUI {
                 if (!explored) continue; // Fog of war
 
                 let color;
+                const stairsBlink = Math.sin(Date.now() * 0.005) > 0;
                 switch (tile) {
                     case TILE.WALL: color = '#3a3a4a'; break;
-                    case TILE.STAIRS_DOWN: color = '#4a90d9'; break;
+                    case TILE.STAIRS_DOWN: color = stairsBlink ? '#4a90d9' : '#7cb8f0'; break;
                     case TILE.CHEST: color = '#ffd740'; break;
                     case TILE.WATER: color = '#1a3a5a'; break;
                     default: color = '#1a1a2a'; break;

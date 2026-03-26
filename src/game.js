@@ -159,6 +159,18 @@ class Game {
                 this.ui.minimap = !this.ui.minimap;
             }
 
+            // Pet switch (P)
+            if (e.code === 'KeyP' && this.state === 'playing' && this.petSystem) {
+                const pets = this.petSystem.collection;
+                if (pets.length > 1) {
+                    const curIdx = pets.indexOf(this.petSystem.activePet);
+                    const nextIdx = (curIdx + 1) % pets.length;
+                    this.petSystem.setActive(nextIdx);
+                    const pet = this.petSystem.activePet;
+                    this.ui.notify(`Pet: ${pet.icon} ${pet.name} Lv${pet.level}`, pet.getRarityColor(), 2);
+                }
+            }
+
             // Stats overlay (Tab)
             if (e.code === 'Tab' && this.state === 'playing') {
                 this.showStats = !this.showStats;
@@ -1373,6 +1385,15 @@ class Game {
                         this.meta.data.souls += soulsEarned - Math.floor(soulsEarned / this.player.soulBonus);
                         this.meta.save();
                     }
+                    // Speed run bonus: under 10 min = +50%, under 5 min = +100%
+                    if (this.playTime < 300) {
+                        soulsEarned = Math.floor(soulsEarned * 2);
+                        this.ui.notify('⚡ SPEED RUN BONUS! 2x Souls!', '#ffeb3b', 3);
+                    } else if (this.playTime < 600) {
+                        soulsEarned = Math.floor(soulsEarned * 1.5);
+                        this.ui.notify('⚡ Fast Run! +50% Souls!', '#ffd740', 3);
+                    }
+
                     this.soulsEarned = soulsEarned;
 
                     // Check milestone unlocks
