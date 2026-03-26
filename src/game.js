@@ -306,17 +306,8 @@ class Game {
         }
 
         // Give starter pet
-        // Class-specific starter pet
-        const classPets = {
-            'Warrior': 'golem',       // Tank pet for tank class
-            'Rogue': 'ghost_pet',     // Fast wolf for fast class
-            'Mage': 'skull',          // Ranged skull for ranged class
-            'Necromancer': 'bat_pet', // Bat for dark class
-        };
-        const petId = classPets[this.player.className];
-        const petDef = petId ? PET_DEFS.find(p => p.id === petId) : null;
-        const starterPet = petDef || this.petSystem.getRandomPet('common');
-        this.petSystem.addPet(starterPet);
+        // Pet assigned after class selection (see classSelect handler below)
+        this._petAssigned = false;
         this.player.relics = [];
 
         // Override player levelUp to show perk choices
@@ -544,6 +535,20 @@ class Game {
         room.enemies.push(enemy);
     }
 
+    _assignClassPet() {
+        if (this._petAssigned || !this.petSystem || !this.player.className) return;
+        this._petAssigned = true;
+        const classPets = {
+            'Warrior': 'golem', 'Rogue': 'ghost_pet',
+            'Mage': 'skull', 'Necromancer': 'bat_pet',
+        };
+        const petId = classPets[this.player.className];
+        const petDef = petId ? PET_DEFS.find(p => p.id === petId) : null;
+        const pet = petDef || this.petSystem.getRandomPet('common');
+        this.petSystem.addPet(pet);
+        if (this.codex) this.codex.trackPet(this.petSystem.activePet);
+    }
+
     equipWeapon(weapon) {
         if (this.player.weapons.length >= 3) {
             // Replace current
@@ -621,6 +626,7 @@ class Game {
             for (let i = 0; i < classIds.length; i++) {
                 if (this.input.keys[`Digit${i + 1}`]) {
                     this.classSelect.select(classIds[i], this.player);
+                    this._assignClassPet();
                     this.input.keys[`Digit${i + 1}`] = false;
                     break;
                 }
@@ -628,6 +634,7 @@ class Game {
             // Mouse click selection
             if (this.input.mouseJustPressed && this.classSelect.hoveredIndex >= 0) {
                 this.classSelect.select(classIds[this.classSelect.hoveredIndex], this.player);
+                this._assignClassPet();
             }
             this.input.mouseJustPressed = false;
             return;
