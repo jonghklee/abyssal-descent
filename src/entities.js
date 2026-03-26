@@ -1060,18 +1060,28 @@ class Enemy extends Entity {
     }
 
     drawHPBar(ctx) {
-        const barWidth = 30;
-        const barHeight = 3;
+        const isSpecial = this.isElite || this.isBoss;
+        const barWidth = isSpecial ? 40 : 30;
+        const barHeight = isSpecial ? 4 : 3;
         const x = this.x - barWidth / 2;
-        const y = this.y - this.h / 2 - 8;
+        const y = this.y - this.h / 2 - (isSpecial ? 14 : 8);
 
-        ctx.fillStyle = 'rgba(0,0,0,0.5)';
+        ctx.fillStyle = 'rgba(0,0,0,0.6)';
         ctx.fillRect(x - 1, y - 1, barWidth + 2, barHeight + 2);
 
         const hpPercent = this.hp / this.maxHp;
         const color = hpPercent > 0.5 ? '#4caf50' : hpPercent > 0.25 ? '#ff9800' : '#f44336';
         ctx.fillStyle = color;
         ctx.fillRect(x, y, barWidth * hpPercent, barHeight);
+
+        // Name for elites
+        if (isSpecial && !this.isBoss) {
+            ctx.fillStyle = this.isElite ? '#ff9800' : '#ff1744';
+            ctx.font = 'bold 7px monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText(this.name.substring(0, 20), this.x, y - 3);
+            ctx.textAlign = 'left';
+        }
     }
 
     drawProjectiles(ctx) {

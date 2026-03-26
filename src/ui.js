@@ -160,7 +160,10 @@ class GameUI {
         ctx.textAlign = 'right';
         ctx.fillStyle = '#78909c';
         ctx.font = 'bold 14px monospace';
-        ctx.fillText(`Floor ${floor}`, w - 20, 30);
+        const biomeIcons = { crypt: '🏚', inferno: '🔥', void: '🌀', abyss: '🌑', heaven: '✨' };
+        const biomeId = (typeof game !== 'undefined' && game.biomeSystem?.current?.id) || 'crypt';
+        const biomeIcon = biomeIcons[biomeId] || '';
+        ctx.fillText(`${biomeIcon} Floor ${floor}`, w - 20, 30);
 
         ctx.font = '11px monospace';
         ctx.fillStyle = '#ffd740';

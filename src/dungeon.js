@@ -548,6 +548,13 @@ class DungeonRenderer {
         ctx.fillStyle = '#2a2a3a';
         ctx.fillRect(wx, wy, TILE_SIZE, TILE_SIZE);
 
+        // Floating arrow indicator above stairs
+        const arrowBob = Math.sin(this.animTime * 4) * 4;
+        ctx.fillStyle = `rgba(74, 144, 217, ${0.5 + Math.sin(this.animTime * 2) * 0.3})`;
+        ctx.font = '12px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('⬇', wx + TILE_SIZE / 2, wy - 8 + arrowBob);
+
         // Animated glow
         const pulse = Math.sin(this.animTime * 3) * 0.3 + 0.7;
         ctx.fillStyle = `rgba(74, 144, 217, ${0.3 * pulse})`;
