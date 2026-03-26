@@ -246,9 +246,29 @@ class GachaSystem {
 
                     // Epic+ gets special effects
                     const rarityIdx = this.rarityOrder.indexOf(this.result);
-                    if (rarityIdx >= 3) { // epic+
-                        Utils.addFlash(GACHA_RARITIES[this.result].color, 0.5);
-                        Utils.addFreeze(rarityIdx >= 4 ? 8 : 4);
+                    if (rarityIdx >= 5) { // MYTHIC — ultra rare celebration
+                        Utils.addFlash('#ff1744', 0.8);
+                        Utils.addFreeze(15);
+                        Utils.addSlowMo(0.1, 2.0);
+                        if (typeof game !== 'undefined' && game.vfx) {
+                            game.vfx.screenCrack();
+                            game.vfx.critSlash(0);
+                            game.vfx.critSlash(Math.PI / 2);
+                            game.vfx.comboExplosion();
+                        }
+                        GameAudio.play('bossDeath');
+                        if (typeof game !== 'undefined' && game.achievements) {
+                            game.achievements.addStat('mythicPulls');
+                        }
+                    } else if (rarityIdx >= 4) { // Legendary
+                        Utils.addFlash(GACHA_RARITIES[this.result].color, 0.6);
+                        Utils.addFreeze(10);
+                        if (typeof game !== 'undefined' && game.achievements) {
+                            game.achievements.addStat('legendaryPulls');
+                        }
+                    } else if (rarityIdx >= 3) { // Epic
+                        Utils.addFlash(GACHA_RARITIES[this.result].color, 0.4);
+                        Utils.addFreeze(4);
                     }
                     GameAudio.play('levelUp');
                 }
