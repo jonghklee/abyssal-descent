@@ -75,5 +75,7 @@ Open `index.html` in any modern browser.
 - Pure HTML5 Canvas + vanilla JavaScript (no frameworks)
 - Web Audio API for procedural sound + biome-aware music
 - localStorage for saves + meta-progression
-- ~12,850 lines of code, 55+ commits
+- ~13,100 lines of code, 80+ commits
+- 192 unique content pieces, 0 bugs
+- 20-floor victory in 281ms (performance verified)
 - Electron-ready for desktop packaging
