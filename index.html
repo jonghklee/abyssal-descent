@@ -19,6 +19,7 @@
             image-rendering: pixelated;
             image-rendering: crisp-edges;
             cursor: none;
+            outline: none;
         }
         #ui-overlay {
             position: fixed;
@@ -30,7 +31,7 @@
     </style>
 </head>
 <body>
-    <canvas id="gameCanvas"></canvas>
+    <canvas id="gameCanvas" tabindex="0"></canvas>
     <div id="ui-overlay"></div>
     <script src="src/utils.js"></script>
     <script src="src/particles.js"></script>
