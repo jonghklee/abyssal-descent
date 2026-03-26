@@ -202,6 +202,17 @@ class CombatSystem {
                 let dmg = weapon.getDamage(player.attack, isCrit);
                 dmg = Math.max(1, dmg);
 
+                // Rogue passive: first hit on fresh enemy = 2x
+                if (player.assassinFirstHit && !enemy._hitOnce) {
+                    dmg *= 2;
+                    enemy._hitOnce = true;
+                }
+
+                // Berserker fury (synergy): below 30% HP = 2x
+                if (player.berserkerFury && player.hp < player.maxHp * 0.3) {
+                    dmg *= 2;
+                }
+
                 // Combo multiplier
                 dmg = Math.floor(dmg * player.getComboMultiplier());
 
@@ -423,6 +434,14 @@ class CombatSystem {
             }
         } else if (player.combo >= 5) {
             Utils.addFlash('#ffeb3b', 0.08);
+        }
+
+        // Warrior passive: +1 ATK per 10 kills
+        if (player.killAttackBonus && player.kills % 10 === 0 && player.kills > 0) {
+            player.attack += 1;
+            if (typeof game !== 'undefined' && game.ui) {
+                game.ui.notify('Berserker: +1 ATK!', '#f44336', 2);
+            }
         }
 
         GameAudio.play(enemy.isBoss ? 'bossDeath' : 'enemyDeath');

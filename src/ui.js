@@ -526,7 +526,8 @@ class GameUI {
 
             ctx.font = 'bold 12px monospace';
             ctx.fillStyle = '#78909c';
-            ctx.fillText('— RUN SUMMARY —', w / 2, cardY + 22);
+            const classText = player.className ? `— ${player.classIcon || ''} ${player.className} Run —` : '— RUN SUMMARY —';
+            ctx.fillText(classText, w / 2, cardY + 22);
 
             // Stats with icons
             const stats = [

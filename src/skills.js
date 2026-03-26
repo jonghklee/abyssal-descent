@@ -65,10 +65,13 @@ class SkillSystem {
     }
 
     update(dt) {
+        // Mage passive: skill cooldowns -30%
+        const cdMult = this.player.skillCdReduction || 1;
+
         // Update cooldowns
         for (const id of Object.keys(this.cooldowns)) {
             if (this.cooldowns[id] > 0) {
-                this.cooldowns[id] -= dt;
+                this.cooldowns[id] -= dt * (1 / cdMult); // Faster recharge
             }
         }
 

@@ -131,7 +131,7 @@ class Particle {
 class ParticleSystem {
     constructor() {
         this.particles = [];
-        this.maxParticles = 2000;
+        this.maxParticles = 1500; // Performance cap
     }
 
     add(particle) {
