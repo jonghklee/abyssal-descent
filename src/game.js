@@ -2012,6 +2012,17 @@ class Game {
         ctx.font = '10px monospace';
         ctx.textAlign = 'left';
         ctx.fillText(`FPS: ${this.fps}`, 5, this.canvas.height - 5);
+
+        // Browser tab title
+        if (this.player && this.state === 'playing') {
+            document.title = `Floor ${this.floor} | ${this.player.className || 'Hero'} Lv${this.player.level} — Abyssal Descent`;
+        } else if (this.state === 'victory') {
+            document.title = 'VICTORY! — Abyssal Descent';
+        } else if (this.state === 'dead') {
+            document.title = 'Game Over — Abyssal Descent';
+        } else {
+            document.title = 'Abyssal Descent';
+        }
     }
 
     renderLighting() {
