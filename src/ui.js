@@ -571,7 +571,11 @@ class GameUI {
                     const totalTime = meta.totalPlayTime || 0;
                     const hours = Math.floor(totalTime / 3600);
                     const mins = Math.floor((totalTime % 3600) / 60);
-                    ctx.fillText(`Codex: ${game.codex.getCompletionPercent()}% | Play Time: ${hours}h ${mins}m`, w / 2, menuY + 132);
+                    ctx.fillText(`Codex: ${game.codex.getCompletionPercent()}% | Time: ${hours}h ${mins}m`, w / 2, menuY + 132);
+                    // Best records
+                    if (meta.bestKills > 0) {
+                        ctx.fillText(`Records: F${meta.bestFloor} | ${meta.bestKills}kills | Lv${meta.bestLevel||1} | ${meta.bestCombo||0}combo | ${meta.bestMaxHit||0}hit`, w / 2, menuY + 148);
+                    }
                 }
             }
             if (typeof game.ascension !== 'undefined' && game.ascension.level > 0) {

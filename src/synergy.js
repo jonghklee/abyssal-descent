@@ -243,6 +243,9 @@ class MetaProgression {
         this.data.bestKills = Math.max(this.data.bestKills, player.kills);
         this.data.totalKills += player.kills;
         this.data.totalGold += Math.floor(player.gold);
+        this.data.bestCombo = Math.max(this.data.bestCombo || 0, player.maxCombo);
+        this.data.bestMaxHit = Math.max(this.data.bestMaxHit || 0, player._maxHit || 0);
+        this.data.bestLevel = Math.max(this.data.bestLevel || 0, player.level);
         // Track total play time
         if (!this.data.totalPlayTime) this.data.totalPlayTime = 0;
         if (game && game.playTime) this.data.totalPlayTime += Math.floor(game.playTime);
