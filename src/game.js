@@ -798,7 +798,21 @@ class Game {
         // Enemies
         for (const enemy of this.enemies) {
             if (!enemy.alive) continue;
-            enemy.update(dt, this.dungeon, this.player);
+
+            // Frozen Hourglass relic: slow nearby enemies
+            if (this.player.auraSlowPct) {
+                const d = Utils.dist(enemy.x, enemy.y, this.player.x, this.player.y);
+                if (d < 120) {
+                    enemy._auraSlow = true;
+                    enemy.update(dt * (1 - this.player.auraSlowPct), this.dungeon, this.player);
+                } else {
+                    enemy._auraSlow = false;
+                    enemy.update(dt, this.dungeon, this.player);
+                }
+            } else {
+                enemy._auraSlow = false;
+                enemy.update(dt, this.dungeon, this.player);
+            }
             enemy.updateProjectiles(dt, this.player, this.dungeon);
 
             // Melee contact damage
@@ -1353,10 +1367,20 @@ class Game {
         // Items (below entities)
         this.items.draw(ctx);
 
-        // Enemies
+        // Enemies (with off-screen culling for performance)
         for (const enemy of this.enemies) {
-            enemy.draw(ctx);
-            enemy.drawProjectiles(ctx);
+            const dx = Math.abs(enemy.x - this.camera.x);
+            const dy = Math.abs(enemy.y - this.camera.y);
+            if (dx < this.camera.halfW + 100 && dy < this.camera.halfH + 100) {
+                // Blue tint for aura-slowed enemies
+                if (enemy._auraSlow) {
+                    ctx.save();
+                    ctx.filter = 'hue-rotate(180deg) brightness(1.2)';
+                }
+                enemy.draw(ctx);
+                if (enemy._auraSlow) ctx.restore();
+                enemy.drawProjectiles(ctx);
+            }
         }
 
         // Combat visuals (swing arcs, projectiles, damage numbers)

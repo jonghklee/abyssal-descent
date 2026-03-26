@@ -39,8 +39,9 @@ class ItemDrop {
 
         const dist = Utils.dist(this.x, this.y, player.x, player.y);
 
-        // Magnet effect for auto-pickup items
-        if (this.autoPickup && dist < this.magnetRange) {
+        // Magnet effect for auto-pickup items (Gold Magnet relic increases range)
+        const effectiveRange = this.magnetRange * (player.magnetMult || 1);
+        if (this.autoPickup && dist < effectiveRange) {
             const angle = Utils.angle(this.x, this.y, player.x, player.y);
             const speed = (1 - dist / this.magnetRange) * 400;
             this.x += Math.cos(angle) * speed * dt;
@@ -200,7 +201,14 @@ class ItemManager {
     }
 
     draw(ctx) {
+        // Off-screen culling for items
+        const cam = typeof game !== 'undefined' ? game.camera : null;
         for (const item of this.items) {
+            if (cam) {
+                const dx = Math.abs(item.x - cam.x);
+                const dy = Math.abs(item.y - cam.y);
+                if (dx > cam.halfW + 50 || dy > cam.halfH + 50) continue;
+            }
             item.draw(ctx);
         }
     }

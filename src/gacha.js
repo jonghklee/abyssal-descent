@@ -93,7 +93,7 @@ const RELIC_POOL = [
     { id: 'thornArmor', name: 'Thorn Armor', desc: 'Reflect 20% melee damage', rarity: 'uncommon', icon: '🌵',
       apply: (p) => { p.thornDmg = (p.thornDmg || 0) + 0.2; } },
     { id: 'magnet', name: 'Gold Magnet', desc: '+50% pickup range', rarity: 'uncommon', icon: '🧲',
-      apply: (p) => { /* Applied via item magnetRange */ } },
+      apply: (p) => { p.magnetMult = (p.magnetMult || 1) * 1.5; } },
     { id: 'hourglass', name: 'Frozen Hourglass', desc: 'Slow enemies 20% near you', rarity: 'rare', icon: '⏳',
       apply: (p) => { p.auraSlowPct = 0.2; } },
     { id: 'crown', name: 'King\'s Crown', desc: '+3 ATK per floor', rarity: 'epic', icon: '👑',
