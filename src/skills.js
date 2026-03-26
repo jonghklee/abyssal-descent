@@ -176,17 +176,22 @@ class SkillSystem {
         const angle = p.facing;
         const speed = 250;
 
-        // Create fireball projectile
+        // Class-specific projectile color
+        const projColor = p.className === 'Necromancer' ? '#e040fb' :
+                          p.className === 'Mage' ? '#ff6d00' :
+                          p.className === 'Rogue' ? '#64ffda' : '#ff6d00';
+
+        // Create projectile
         combat.playerProjectiles.push({
             x: p.x + Math.cos(angle) * 20,
             y: p.y + Math.sin(angle) * 20,
             vx: Math.cos(angle) * speed,
             vy: Math.sin(angle) * speed,
             damage: Math.floor((p.attack + 25) * 1.5 * this._getClassSkillMult()),
-            weapon: { effects: ['fire'], rarity: 'epic', getRarityColor: () => '#ff6d00' },
+            weapon: { effects: ['fire'], rarity: 'epic', getRarityColor: () => projColor },
             player: p,
             size: 10,
-            color: '#ff6d00',
+            color: projColor,
             life: 2,
             piercing: false,
             isFireball: true,
@@ -196,11 +201,11 @@ class SkillSystem {
         Utils.addFlash('#ff6d00', 0.15);
         GameAudio.play('attack');
 
-        // Muzzle flash
+        // Muzzle flash (class-colored)
         particles.explosion(
             p.x + Math.cos(angle) * 20,
             p.y + Math.sin(angle) * 20,
-            '#ff6d00', 10
+            projColor, 10
         );
 
         return true;
