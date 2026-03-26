@@ -140,6 +140,15 @@ class Game {
                 this.ui.minimap = !this.ui.minimap;
             }
 
+            // Pause (Escape during gameplay)
+            if (e.code === 'Escape' && (this.state === 'playing' || this.state === 'paused')) {
+                if (this.codex && this.codex.showScreen) {
+                    this.codex.showScreen = false;
+                } else {
+                    this.state = this.state === 'paused' ? 'playing' : 'paused';
+                }
+            }
+
             // Codex (C)
             if (e.code === 'KeyC' && this.state === 'playing') {
                 if (this.codex) {
@@ -1477,6 +1486,25 @@ class Game {
 
         // ---- Synergy notification ----
         if (this.synergySystem) this.synergySystem.draw(ctx, w, h);
+
+        // ---- Pause screen ----
+        if (this.state === 'paused') {
+            ctx.fillStyle = 'rgba(0,0,0,0.7)';
+            ctx.fillRect(0, 0, w, h);
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#e0e0e0';
+            ctx.font = 'bold 36px monospace';
+            ctx.fillText('PAUSED', w / 2, h * 0.35);
+            ctx.fillStyle = '#78909c';
+            ctx.font = '14px monospace';
+            ctx.fillText(`Floor ${this.floor} | ${this.player.className || 'Adventurer'} Lv.${this.player.level}`, w / 2, h * 0.42);
+            ctx.fillText(`Kills: ${this.player.kills} | Gold: ${Math.floor(this.player.gold)}`, w / 2, h * 0.47);
+            ctx.fillStyle = '#546e7a';
+            ctx.font = '12px monospace';
+            ctx.fillText('[ESC] Resume  |  [C] Codex', w / 2, h * 0.58);
+            ctx.fillText('WASD Move | Click Attack | Space Dash', w / 2, h * 0.63);
+            ctx.fillText('Q Potion | E Switch | R Forge | T Slots | F Finisher', w / 2, h * 0.67);
+        }
 
         // ---- Death screen ----
         if (this.state === 'dead') {

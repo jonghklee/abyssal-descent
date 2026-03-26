@@ -484,14 +484,28 @@ class GameUI {
         // Meta stats
         if (typeof game !== 'undefined' && game.meta) {
             const meta = game.meta.data;
-            ctx.fillStyle = '#37474f';
-            ctx.font = '10px monospace';
             if (meta.totalRuns > 0) {
-                ctx.fillText(`Runs: ${meta.totalRuns} | Best Floor: ${meta.bestFloor} | Souls: ${meta.souls}`, w / 2, menuY + 110);
+                ctx.fillStyle = '#37474f';
+                ctx.font = '10px monospace';
+                ctx.fillText(`Runs: ${meta.totalRuns} | Best Floor: ${meta.bestFloor} | Kills: ${meta.totalKills} | Souls: ${meta.souls}`, w / 2, menuY + 100);
+
+                // Best class info
+                if (meta.classesPlayed) {
+                    const classes = Object.keys(meta.classesPlayed);
+                    ctx.fillStyle = '#2e3440';
+                    ctx.fillText(`Classes: ${classes.join(', ')}`, w / 2, menuY + 116);
+                }
+
+                // Codex progress
+                if (typeof game.codex !== 'undefined') {
+                    ctx.fillStyle = '#2e3440';
+                    ctx.fillText(`Codex: ${game.codex.getCompletionPercent()}%`, w / 2, menuY + 132);
+                }
             }
             if (typeof game.ascension !== 'undefined' && game.ascension.level > 0) {
                 ctx.fillStyle = '#ffd740';
-                ctx.fillText(`Ascension Level: ${game.ascension.level}`, w / 2, menuY + 128);
+                ctx.font = 'bold 10px monospace';
+                ctx.fillText(`★ Ascension ${game.ascension.level} ★`, w / 2, menuY + 148);
             }
         }
 
