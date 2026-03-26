@@ -238,8 +238,8 @@ class ItemManager {
             this.items.push(new ItemDrop(x, y, 'xpOrb', { amount: xpPerOrb }));
         }
 
-        // Potion chance
-        if (Math.random() < 0.1) {
+        // Potion chance (elites guaranteed, normals 10%)
+        if (enemy.isElite || enemy.isBoss || Math.random() < 0.1) {
             this.items.push(new ItemDrop(x, y, 'potion'));
         }
 
