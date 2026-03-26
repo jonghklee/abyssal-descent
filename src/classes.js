@@ -121,6 +121,27 @@ class ClassSelect {
 
         GameAudio.play('levelUp');
         Utils.addFlash(cls.color, 0.3);
+
+        // Random start blessing (one per run)
+        if (typeof game !== 'undefined') {
+            const startBlessings = [
+                { msg: '🎁 Bonus: +3 Potions!', apply: () => { player.potions += 3; } },
+                { msg: '🎁 Bonus: +50 Gold!', apply: () => { player.gold += 50; } },
+                { msg: '🎁 Bonus: +5 ATK!', apply: () => { player.attack += 5; } },
+                { msg: '🎁 Bonus: +20 Max HP!', apply: () => { player.maxHp += 20; player.hp = player.maxHp; } },
+                { msg: '🎁 Bonus: +10% Crit!', apply: () => { player.critChance += 0.1; } },
+                { msg: '🎁 Bonus: +3 DEF!', apply: () => { player.defense += 3; } },
+                { msg: '🎁 Bonus: Free Gacha Pull!', apply: () => {
+                    setTimeout(() => {
+                        if (game.gacha) game.gacha.pull(1, (r) => { if (r.type === 'weapon') game.weaponPickup = r.item; });
+                    }, 3000);
+                }},
+                { msg: 'No bonus this time...', apply: () => {} },
+            ];
+            const blessing = Utils.randChoice(startBlessings);
+            blessing.apply();
+            setTimeout(() => game.ui.notify(blessing.msg, '#ffd740', 3), 1500);
+        }
     }
 
     update(dt) {
