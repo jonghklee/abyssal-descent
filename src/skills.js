@@ -109,6 +109,15 @@ class SkillSystem {
         return false;
     }
 
+    _getClassSkillMult() {
+        // Class bonuses to skills
+        const p = this.player;
+        if (p.className === 'Mage') return 1.5;      // Mage: 50% stronger skills
+        if (p.className === 'Warrior') return 1.2;    // Warrior: 20% stronger
+        if (p.className === 'Necromancer') return 1.3; // Necro: 30% stronger
+        return 1.0; // Rogue: normal (compensated by crit)
+    }
+
     useWhirlwind(enemies, combat) {
         const p = this.player;
         const range = 60;
@@ -133,7 +142,7 @@ class SkillSystem {
             if (!enemy.alive) continue;
             const dist = Utils.dist(p.x, p.y, enemy.x, enemy.y);
             if (dist < range + enemy.w / 2) {
-                const dmg = Math.floor((p.attack + 15) * p.getComboMultiplier());
+                const dmg = Math.floor((p.attack + 15) * p.getComboMultiplier() * this._getClassSkillMult());
                 enemy.takeDamage(dmg, p.x, p.y);
                 p.addCombo();
                 combat.addDamageNumber(enemy.x, enemy.y - enemy.h / 2, dmg, false);
@@ -173,7 +182,7 @@ class SkillSystem {
             y: p.y + Math.sin(angle) * 20,
             vx: Math.cos(angle) * speed,
             vy: Math.sin(angle) * speed,
-            damage: Math.floor((p.attack + 25) * 1.5),
+            damage: Math.floor((p.attack + 25) * 1.5 * this._getClassSkillMult()),
             weapon: { effects: ['fire'], rarity: 'epic', getRarityColor: () => '#ff6d00' },
             player: p,
             size: 10,
