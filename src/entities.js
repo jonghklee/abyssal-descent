@@ -102,6 +102,7 @@ class Entity {
                 this.invulnerable = 2;
                 if (typeof game !== 'undefined') {
                     game.ui.notify('💀 LAST STAND! Survived at 1 HP!', '#ff1744', 3);
+                    if (game.achievements) game.achievements.addStat('lastStands');
                     Utils.addSlowMo(0.15, 1.0);
                     Utils.addShake(12);
                     Utils.addFlash('#ff1744', 0.4);
@@ -361,6 +362,8 @@ class Player extends Entity {
 
     usePotion() {
         if (this.potions > 0 && this.hp < this.maxHp) {
+            if (!this._potionsUsed) this._potionsUsed = 0;
+            this._potionsUsed++;
             // No healing if no-heal floor modifier
             if (typeof game !== 'undefined' && game.noHeal) {
                 return false;

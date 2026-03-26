@@ -40,6 +40,12 @@ const ACHIEVEMENT_DEFS = [
     { id: 'codex_50',       name: 'Librarian',           desc: '50% Codex completion',         icon: '📖', check: (s) => s.codexPct >= 50, reward: { gold: 300, gacha: true } },
     { id: 'floor_50',       name: 'Depth Dweller',       desc: 'Reach floor 50',               icon: '🕳', check: (s) => s.floor >= 50, reward: { gold: 500, gacha: true } },
     { id: 'all_classes',    name: 'Versatile',           desc: 'Play all 3 classes',           icon: '🎭', check: (s) => s.classesPlayed >= 3, reward: { gold: 200, gacha: true } },
+    // Hidden challenge achievements
+    { id: 'last_stand',    name: 'Defiant',             desc: 'Survive via Last Stand',       icon: '💀', check: (s) => s.lastStands >= 1, reward: { gold: 100 } },
+    { id: 'golden_hunt',   name: 'Gold Digger',         desc: 'Kill 10 golden enemies',       icon: '✦', check: (s) => s.goldenKills >= 10, reward: { gold: 500, gacha: true } },
+    { id: 'speed_5min',    name: 'Speedrunner',         desc: 'Clear floor 10 in under 5min', icon: '⚡', check: (s) => s.floor >= 10 && s.playTime < 300, reward: { gold: 300, gacha: true } },
+    { id: 'no_potion',     name: 'Iron Man',            desc: 'Reach floor 5 without potions', icon: '💪', check: (s) => s.floor >= 5 && s.potionsUsed === 0, reward: { gold: 200 } },
+    { id: 'win_necro',     name: 'Lord of the Dead',    desc: 'Win as Necromancer',           icon: '💀', check: (s) => s.isNecro && s.victory, reward: { gold: 500, gacha: true } },
 ];
 
 class AchievementSystem {
@@ -53,6 +59,8 @@ class AchievementSystem {
             bestStreak: 0, bossKills: 0, critKills: 0,
             perfectRooms: 0, relicCount: 0, legendaryPulls: 0,
             mythicPulls: 0, level: 1, eliteKills: 0,
+            goldenKills: 0, lastStands: 0, minibossKills: 0,
+            secretRooms: 0, potionsUsed: 0,
         };
     }
 
@@ -70,6 +78,10 @@ class AchievementSystem {
         this.stats.isRogue = player.className === 'Rogue';
         this.stats.isMage = player.className === 'Mage';
         this.stats.codexPct = game.codex ? game.codex.getCompletionPercent() : 0;
+        this.stats.isNecro = player.className === 'Necromancer';
+        this.stats.victory = game.state === 'victory';
+        this.stats.playTime = game.playTime || 0;
+        this.stats.potionsUsed = player._potionsUsed || 0;
 
         // Track classes played (persist in meta)
         if (game.meta && player.className) {

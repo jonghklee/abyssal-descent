@@ -487,6 +487,7 @@ class CombatSystem {
             }
             if (typeof game !== 'undefined') {
                 game.ui.notify(`✦ GOLDEN KILL! +${enemy.goldReward}g +${enemy.xpReward}xp!`, '#ffd740', 3);
+                if (game.achievements) game.achievements.addStat('goldenKills');
                 if (game.vfx) game.vfx.legendaryBeam(
                     enemy.x - game.camera.x + game.camera.halfW,
                     enemy.y - game.camera.y + game.camera.halfH
