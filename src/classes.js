@@ -140,7 +140,10 @@ class ClassSelect {
             ];
             const blessing = Utils.randChoice(startBlessings);
             blessing.apply();
-            setTimeout(() => game.ui.notify(blessing.msg, '#ffd740', 3), 1500);
+            setTimeout(() => {
+                game.ui.notify(blessing.msg, '#ffd740', 3);
+                game.ui.notify(`${cls.icon} ${cls.name}: ${cls.passive}`, cls.color, 4);
+            }, 1500);
         }
     }
 
