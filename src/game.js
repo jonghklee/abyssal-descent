@@ -633,6 +633,11 @@ class Game {
                 if (this.ascension && this.ascension.canAscend()) {
                     this.ascension.ascend(this);
                     this.ui.notify(`⬆ ASCENSION ${this.ascension.level}! Enemies grow stronger...`, '#ffd740', 5);
+                    // Ascension reward: +5 ATK permanently per level
+                    this.player.attack += 5;
+                    this.player.maxHp += 20;
+                    this.player.hp = Math.min(this.player.hp + 20, this.player.maxHp);
+                    this.ui.notify(`Ascension Bonus: +5 ATK, +20 HP!`, '#64ffda', 3);
                 }
                 this.state = 'playing';
                 this.generateFloor();
