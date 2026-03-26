@@ -19,8 +19,7 @@ const SYNERGY_DEFS = [
         icon: '👢⚡',
         color: '#00e5ff',
         requires: ['swiftBoots', 'ghostCloak'],
-        apply: (p) => { /* Applied via weapon cooldown reduction in combat */ },
-        combatMod: { attackSpeedMult: 0.5 },
+        apply: (p) => { p.attackSpeedBonus = 0.5; }, // 50% faster attacks
     },
     {
         id: 'holy_guardian',

@@ -1246,6 +1246,7 @@ class Game {
             else if (currentRoom.type === 'secret' && !currentRoom.eventTriggered) {
                 currentRoom.eventTriggered = true;
                 this.ui.notify('✨ Secret Room Discovered!', '#ffd740', 3);
+                if (this.achievements) this.achievements.addStat('secretRooms');
                 Utils.addFlash('#ffd740', 0.2);
                 GameAudio.play('chest');
             }
@@ -1463,6 +1464,10 @@ class Game {
                 particles.levelUpEffect(this.player.x, this.player.y);
 
                 // Boss defeat reward
+                if (room.type === 'miniboss') {
+                    if (this.achievements) this.achievements.addStat('minibossKills');
+                    this.ui.notify('⭐ Miniboss Defeated!', '#ff9800', 3);
+                }
                 if (room.type === 'boss') {
                     this.ui.notify('BOSS DEFEATED!', '#ff1744', 5);
                     Utils.addShake(12);

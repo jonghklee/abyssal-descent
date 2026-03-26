@@ -180,7 +180,9 @@ class CombatSystem {
         if (player.weapons.length === 0) return;
 
         const weapon = player.weapons[player.currentWeapon];
-        player.attackCooldown = weapon.cooldown;
+        // Speed Demon synergy: 50% faster attacks
+        const speedMult = player.attackSpeedBonus ? (1 - player.attackSpeedBonus) : 1;
+        player.attackCooldown = weapon.cooldown * speedMult;
 
         if (weapon.weaponType === 'melee') {
             this.meleeAttack(player, weapon, enemies, input);
