@@ -191,9 +191,16 @@ class Game {
             if (e.code === 'Escape' && (this.state === 'playing' || this.state === 'paused')) {
                 if (this.codex && this.codex.showScreen) {
                     this.codex.showScreen = false;
+                } else if (this.showStats) {
+                    this.showStats = false;
                 } else {
                     this.state = this.state === 'paused' ? 'playing' : 'paused';
                 }
+            }
+
+            // Allow Codex from pause screen
+            if (e.code === 'KeyC' && this.state === 'paused' && this.codex) {
+                this.codex.showScreen = !this.codex.showScreen;
             }
 
             // Codex (C)
