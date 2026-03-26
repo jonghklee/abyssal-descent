@@ -130,6 +130,51 @@ const PERK_POOL = [
             player.hp = Math.min(player.hp, player.maxHp);
         },
     },
+    {
+        id: 'vampiric_touch',
+        name: 'Vampiric Touch',
+        description: '+8% Lifesteal',
+        icon: '♦',
+        color: '#e91e63',
+        rarity: 'rare',
+        apply(player) { player.lifesteal += 0.08; },
+    },
+    {
+        id: 'executioner',
+        name: 'Executioner',
+        description: '2x damage to enemies below 25% HP',
+        icon: '✗',
+        color: '#f44336',
+        rarity: 'epic',
+        apply(player) { player.executioner = true; },
+    },
+    {
+        id: 'lucky_7',
+        name: 'Lucky Seven',
+        description: '+7 ATK, +7% Crit, +7 Speed',
+        icon: '7',
+        color: '#ffd740',
+        rarity: 'rare',
+        apply(player) { player.attack += 7; player.critChance += 0.07; player.speed += 7; },
+    },
+    {
+        id: 'second_wind',
+        name: 'Second Wind',
+        description: '+2 Potions, Potions heal 60% instead of 40%',
+        icon: '+',
+        color: '#66bb6a',
+        rarity: 'uncommon',
+        apply(player) { player.potions += 2; player.potionPower = 0.6; },
+    },
+    {
+        id: 'gold_rush_perk',
+        name: 'Midas Touch',
+        description: '+50% Gold from all sources',
+        icon: '$',
+        color: '#ffd740',
+        rarity: 'uncommon',
+        apply(player) { player.goldMultiplier = (player.goldMultiplier || 1) * 1.5; },
+    },
 ];
 
 class PerkSystem {

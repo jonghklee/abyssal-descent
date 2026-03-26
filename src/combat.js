@@ -233,6 +233,11 @@ class CombatSystem {
                     dmg *= 2;
                 }
 
+                // Executioner perk: 2x to enemies below 25% HP
+                if (player.executioner && enemy.hp < enemy.maxHp * 0.25) {
+                    dmg *= 2;
+                }
+
                 // Combo multiplier
                 dmg = Math.floor(dmg * player.getComboMultiplier());
 
