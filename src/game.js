@@ -253,6 +253,13 @@ class Game {
 
         // Prevent context menu
         this.canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+
+        // Auto-save on page close
+        window.addEventListener('beforeunload', () => {
+            if (this.state === 'playing' && this.saveSystem) {
+                this.saveSystem.save(this);
+            }
+        });
     }
 
     startGame(skipClassSelect = false) {
