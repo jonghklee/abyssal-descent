@@ -359,9 +359,24 @@ class Game {
     }
 
     getBossType() {
-        if (this.floor >= 20) return 'boss_dragon';
+        // Cycle through bosses in endless mode
+        const bossPool = ['boss_demon', 'boss_lich', 'boss_dragon'];
+        if (this.floor >= 20) {
+            // Endless: cycle bosses with increasing difficulty
+            return bossPool[(Math.floor(this.floor / 5) - 1) % bossPool.length];
+        }
         if (this.floor >= 10) return 'boss_lich';
         return 'boss_demon';
+    }
+
+    getFloorDifficulty() {
+        const base = 1 + (this.floor - 1) * 0.12;
+        if (this.floor > 20) {
+            // Endless: moderate exponential (player also scales via perks/relics/forge)
+            const endlessMult = Math.pow(1.05, this.floor - 20);
+            return base * endlessMult;
+        }
+        return base;
     }
 
     spawnEnemyInRoom(room, types) {
@@ -370,12 +385,12 @@ class Game {
         const y = Utils.randInt(room.y + 1, room.y + room.h - 2) * TILE_SIZE + TILE_SIZE / 2;
         const enemy = new Enemy(x, y, type);
 
-        // Scale with floor
-        const scale = 1 + (this.floor - 1) * 0.12;
+        // Scale with floor (uses exponential scaling for endless)
+        const scale = this.getFloorDifficulty();
         enemy.maxHp = Math.floor(enemy.maxHp * scale);
         enemy.hp = enemy.maxHp;
-        enemy.baseAttack = Math.floor(enemy.baseAttack * (1 + (this.floor - 1) * 0.08));
-        enemy.xpReward = Math.floor(enemy.xpReward * scale);
+        enemy.baseAttack = Math.floor(enemy.baseAttack * (1 + (this.floor - 1) * 0.08 + (this.floor > 20 ? (this.floor - 20) * 0.05 : 0)));
+        enemy.xpReward = Math.floor(enemy.xpReward * scale * 1.2); // More XP in endless
         enemy.goldReward = Math.floor(enemy.goldReward * scale);
 
         // Elite enemy chance (increases with floor)
@@ -970,6 +985,21 @@ class Game {
     descend() {
         this.floor++;
         GameAudio.play('stairs');
+
+        // Floor milestones
+        const milestones = {
+            10: { msg: '🏔 FLOOR 10 — The Void Awaits', color: '#7c4dff' },
+            15: { msg: '🌑 FLOOR 15 — The Abyss Opens', color: '#ff1744' },
+            20: { msg: '✨ FLOOR 20 — Celestial Ruins', color: '#fff9c4' },
+            25: { msg: '♾ FLOOR 25 — ENDLESS MODE BEGINS', color: '#ffd740' },
+            50: { msg: '☠ FLOOR 50 — Legendary Territory', color: '#ff1744' },
+            100: { msg: '👑 FLOOR 100 — IMMORTAL REALM', color: '#ffd740' },
+        };
+        if (milestones[this.floor]) {
+            const m = milestones[this.floor];
+            this.ui.notify(m.msg, m.color, 5);
+            if (this.vfx) this.vfx.bossEntrance();
+        }
 
         // Every 2 floors: Lucky Wheel!
         if (this.floor % 2 === 0 && this.luckWheel) {
