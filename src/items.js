@@ -167,10 +167,19 @@ class ItemDrop {
             case 'weapon':
                 const weapon = this.data.weapon;
                 const rColor = weapon.getRarityColor();
+                const glowPulse = Math.sin(this.bobTimer * 3) * 5 + 10;
                 ctx.shadowColor = rColor;
+                ctx.shadowBlur = glowPulse;
                 ctx.fillStyle = rColor;
                 // Weapon icon
                 ctx.fillRect(-8, -2, 16, 4);
+                // Rarity beam (epic+ only)
+                const rIdx = ['common','uncommon','rare','epic','legendary'].indexOf(weapon.rarity);
+                if (rIdx >= 3) {
+                    ctx.globalAlpha = 0.15 + Math.sin(this.bobTimer * 2) * 0.1;
+                    ctx.fillRect(-1, -30, 2, 30);
+                    ctx.globalAlpha = 1;
+                }
                 // Glow ring
                 ctx.strokeStyle = rColor;
                 ctx.lineWidth = 1;
