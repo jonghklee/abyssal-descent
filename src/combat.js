@@ -240,7 +240,7 @@ class CombatSystem {
                         }
                     }
 
-                    // Weapon effects
+                    // Weapon elemental effects with visuals
                     if (weapon.effects.includes('fire')) {
                         particles.explosion(enemy.x, enemy.y, '#ff6600', 8);
                         enemy.takeDamage(Math.floor(dmg * 0.2), player.x, player.y);
@@ -248,6 +248,41 @@ class CombatSystem {
                     if (weapon.effects.includes('ice')) {
                         enemy.speed *= 0.5;
                         setTimeout(() => { if (enemy.alive) enemy.speed *= 2; }, 2000);
+                        // Ice crystals
+                        for (let k = 0; k < 5; k++) {
+                            particles.add(new Particle(enemy.x + Utils.rand(-8,8), enemy.y + Utils.rand(-8,8), {
+                                life: 0.5, size: Utils.rand(2,4), endSize: 0,
+                                color: Utils.randChoice(['#4fc3f7','#b3e5fc','#e1f5fe']),
+                                vy: Utils.rand(-1, 0), shape: 'square', rotSpeed: 3,
+                            }));
+                        }
+                    }
+                    if (weapon.effects.includes('poison')) {
+                        // Poison DoT
+                        if (!enemy._poisoned) {
+                            enemy._poisoned = true;
+                            const poisonDmg = Math.floor(dmg * 0.05);
+                            const poisonInterval = setInterval(() => {
+                                if (!enemy.alive) { clearInterval(poisonInterval); return; }
+                                enemy.takeDamage(poisonDmg, enemy.x, enemy.y);
+                                particles.add(new Particle(enemy.x, enemy.y - 5, {
+                                    life: 0.3, size: 2, endSize: 0, color: '#66bb6a', vy: -1,
+                                }));
+                            }, 500);
+                            setTimeout(() => { clearInterval(poisonInterval); enemy._poisoned = false; }, 3000);
+                        }
+                    }
+                    if (weapon.effects.includes('chain')) {
+                        // Chain lightning to nearby enemy
+                        for (const other of enemies) {
+                            if (other === enemy || !other.alive) continue;
+                            const d = Utils.dist(enemy.x, enemy.y, other.x, other.y);
+                            if (d < 80) {
+                                other.takeDamage(Math.floor(dmg * 0.3), enemy.x, enemy.y);
+                                particles.hitSpark(other.x, other.y, '#ffeb3b', 5);
+                                break; // Only chain to 1
+                            }
+                        }
                     }
                     if (weapon.effects.includes('lifesteal') || player.lifesteal > 0) {
                         const stealPct = (weapon.effects.includes('lifesteal') ? 0.1 : 0) + player.lifesteal;
@@ -401,9 +436,38 @@ class CombatSystem {
         player.gold += enemy.goldReward;
         player.kills++;
 
-        particles.explosion(enemy.x, enemy.y,
-            enemy.isBoss ? '#ff1744' : '#ff6600',
-            enemy.isBoss ? 60 : 25);
+        // Type-specific death effects
+        const deathColors = {
+            slime: '#66bb6a', skeleton: '#e0e0e0', bat: '#ce93d8',
+            zombie: '#558b2f', ghost: '#b3e5fc', mage: '#e040fb',
+            knight: '#90a4ae', assassin: '#263238', necromancer: '#7c4dff',
+            golem_enemy: '#8d6e63',
+            boss_demon: '#ff1744', boss_lich: '#e040fb', boss_dragon: '#ff6d00',
+        };
+        const deathColor = deathColors[enemy.type] || '#ff6600';
+        const deathCount = enemy.isBoss ? 60 : enemy.isElite ? 35 : 25;
+        particles.explosion(enemy.x, enemy.y, deathColor, deathCount);
+
+        // Slime splits into small particles
+        if (enemy.type === 'slime') {
+            for (let i = 0; i < 6; i++) {
+                particles.add(new Particle(enemy.x + Utils.rand(-8,8), enemy.y + Utils.rand(-8,8), {
+                    life: 0.5, size: Utils.rand(3,6), endSize: 0,
+                    color: '#66bb6a', gravity: 0.2, friction: 0.95,
+                    vx: Utils.rand(-3,3), vy: Utils.rand(-4,-1),
+                }));
+            }
+        }
+        // Ghost fades with ethereal wisps
+        if (enemy.type === 'ghost') {
+            for (let i = 0; i < 8; i++) {
+                particles.add(new Particle(enemy.x, enemy.y, {
+                    life: 1.0, size: Utils.rand(2,4), endSize: 8,
+                    color: 'rgba(179,229,252,0.3)',
+                    vy: Utils.rand(-2,-0.5), vx: Utils.rand(-1,1),
+                }));
+            }
+        }
 
         Utils.addShake(enemy.isBoss ? 15 : 5);
         Utils.addFreeze(enemy.isBoss ? 10 : 2);
