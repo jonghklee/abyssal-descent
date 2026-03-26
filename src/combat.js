@@ -120,6 +120,19 @@ class Weapon {
             this.effects.push('fire');
             this.effects.push('lifesteal');
             this.effects.push('critBoost');
+            // Unique legendary names
+            const legendaryNames = {
+                sword: Utils.randChoice(['Excalibur', 'Dawnbreaker', 'Void Cleaver', 'Soul Reaper']),
+                axe: Utils.randChoice(['Ragnarok', 'World Splitter', 'Doom Axe', 'Titan Cleaver']),
+                dagger: Utils.randChoice(['Whisper', 'Shadowfang', 'Death Kiss', 'Phantom Blade']),
+                spear: Utils.randChoice(['Gungnir', 'Dragon Lance', 'Heaven Piercer', 'Fate\'s Point']),
+                staff: Utils.randChoice(['Arcane Infinity', 'Nova Staff', 'Void Scepter', 'Star Weaver']),
+                bow: Utils.randChoice(['Artemis', 'Storm Bow', 'Soul Hunter', 'Eclipse Arc']),
+            };
+            if (legendaryNames[this.type]) {
+                this.name = legendaryNames[this.type];
+                this.uniqueName = true;
+            }
         }
     }
 
@@ -141,6 +154,9 @@ class Weapon {
     }
 
     getDisplayName() {
+        // Unique legendary names don't get generic prefix
+        if (this.uniqueName) return this.name;
+
         const prefixes = {
             uncommon: 'Fine',
             rare: 'Superior',
