@@ -1504,8 +1504,22 @@ class Game {
                         this.vfx.screenCrack();
                         this.vfx.comboExplosion();
                     }
-                    // Boss drops gacha + gold
+                    // Boss drops gacha + gold + guaranteed relic
                     this.player.gold += 50 + this.floor * 10;
+
+                    // Guaranteed relic drop from boss
+                    const unownedRelics = RELIC_POOL.filter(r =>
+                        !this.player.relics?.find(pr => pr.id === r.id)
+                    );
+                    if (unownedRelics.length > 0) {
+                        const relic = Utils.randChoice(unownedRelics);
+                        relic.apply(this.player);
+                        if (!this.player.relics) this.player.relics = [];
+                        this.player.relics.push(relic);
+                        if (this.codex) this.codex.trackRelic(relic);
+                        this.ui.notify(`${relic.icon} BOSS DROP: ${relic.name}!`, '#ff9800', 4);
+                    }
+
                     setTimeout(() => {
                         this.gacha.pull(this.floor, (reward) => {
                             if (reward.type === 'weapon') this.weaponPickup = reward.item;
