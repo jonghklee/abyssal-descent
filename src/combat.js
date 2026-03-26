@@ -530,6 +530,17 @@ class CombatSystem {
         const deathCount = enemy.isBoss ? 60 : enemy.isElite ? 35 : 25;
         particles.explosion(enemy.x, enemy.y, deathColor, deathCount);
 
+        // Skeleton bone scatter
+        if (enemy.type === 'skeleton') {
+            for (let i = 0; i < 5; i++) {
+                particles.add(new Particle(enemy.x + Utils.rand(-6,6), enemy.y + Utils.rand(-6,6), {
+                    life: 0.6, size: Utils.rand(2,4), endSize: 1,
+                    color: '#e0e0e0', gravity: 0.25, friction: 0.95,
+                    vx: Utils.rand(-3,3), vy: Utils.rand(-4,-1),
+                    shape: 'line', rotSpeed: Utils.rand(-8,8),
+                }));
+            }
+        }
         // Slime splits into small particles
         if (enemy.type === 'slime') {
             for (let i = 0; i < 6; i++) {
