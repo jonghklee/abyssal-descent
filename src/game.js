@@ -472,8 +472,14 @@ class Game {
         enemy.xpReward = Math.floor(enemy.xpReward * scale * 1.2); // More XP in endless
         enemy.goldReward = Math.floor(enemy.goldReward * scale);
 
-        // Elite enemy chance (increases with floor)
-        const eliteChance = Math.min(0.05 + this.floor * 0.02, 0.25);
+        // Ascension modifiers
+        if (this.ascension && this.ascension.level > 0) {
+            this.ascension.applyToEnemy(enemy, this);
+        }
+
+        // Elite enemy chance (increases with floor + ascension)
+        const eliteMult = this.eliteChanceMult || 1;
+        const eliteChance = Math.min((0.05 + this.floor * 0.02) * eliteMult, 0.5);
         if (Math.random() < eliteChance) {
             EventSystem.makeElite(enemy, this.floor);
         }
@@ -534,7 +540,11 @@ class Game {
         if (this.state === 'victory') {
             this.ui.victoryTimer = (this.ui.victoryTimer || 0) + dt;
             if (this.input.keys['Digit1'] && this.ui.victoryTimer > 2) {
-                // Continue to endless mode
+                // Continue to endless mode + ascend
+                if (this.ascension && this.ascension.canAscend()) {
+                    this.ascension.ascend(this);
+                    this.ui.notify(`⬆ ASCENSION ${this.ascension.level}! Enemies grow stronger...`, '#ffd740', 5);
+                }
                 this.state = 'playing';
                 this.generateFloor();
                 this.ui.notify('♾ ENDLESS MODE — How deep can you go?', '#ffd740', 5);

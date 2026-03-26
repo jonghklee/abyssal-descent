@@ -647,9 +647,10 @@ class CombatSystem {
             ctx.fillStyle = '#5d4037';
             ctx.fillRect(8, -2, 8, 4);
 
-            // Weapon blade
+            // Weapon blade with rarity glow
+            const rarityIdx = ['common','uncommon','rare','epic','legendary'].indexOf(weapon.rarity);
             ctx.fillStyle = weapon.getRarityColor();
-            ctx.shadowBlur = weapon.isSwinging ? 8 : 0;
+            ctx.shadowBlur = rarityIdx >= 3 ? 12 : (weapon.isSwinging ? 8 : 0); // Epic+ always glows
             ctx.shadowColor = weapon.getRarityColor();
 
             switch (weapon.type) {
