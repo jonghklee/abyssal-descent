@@ -1933,6 +1933,7 @@ class Game {
                 ['Best Combo', p.maxCombo, '#ff4081'],
                 ['Relics', p.relics ? p.relics.length : 0, '#b388ff'],
                 ['Pets', this.petSystem ? this.petSystem.collection.length : 0, '#e91e63'],
+                ['Time', `${Math.floor(this.playTime/60)}m ${Math.floor(this.playTime%60)}s`, '#78909c'],
             ];
             for (let i = 0; i < stats.length; i++) {
                 ctx.fillStyle = '#546e7a';
