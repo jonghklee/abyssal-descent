@@ -189,6 +189,8 @@ class MetaProgression {
             { id: 'runs_25',     check: d.totalRuns >= 25,      reward: '+100 Start HP',       apply: () => { d.unlocks.bonusHp = 100; } },
             { id: 'boss_5',      check: d.totalBossKills >= 5,  reward: 'Start +5 DEF',       apply: () => { d.unlocks.bonusDef = 5; } },
             { id: 'gold_5000',   check: d.totalGold >= 5000,    reward: 'Start +100 Gold',    apply: () => { d.unlocks.startGold = 100; } },
+            { id: 'victory',     check: d.victories >= 1,      reward: 'Unlock Ascension!',  apply: () => { d.unlocks.ascensionUnlocked = true; } },
+            { id: 'victory_3',   check: d.victories >= 3,      reward: 'Start +30 ATK',      apply: () => { d.unlocks.bonusAtk = 30; } },
         ];
 
         let newUnlocks = [];

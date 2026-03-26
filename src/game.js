@@ -1385,6 +1385,9 @@ class Game {
             this._victoryShown = true;
             this.state = 'victory';
             this.ui.victoryTimer = 0;
+            // Track victory
+            if (!this.meta.data.victories) this.meta.data.victories = 0;
+            this.meta.data.victories++;
             // Earn bonus souls
             const victorySouls = this.meta.endRun(this.player, this.floor, this);
             this.soulsEarned = victorySouls * 2; // Double souls for winning!

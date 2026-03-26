@@ -437,6 +437,12 @@ class CombatSystem {
 
     onEnemyDeath(enemy, player) {
         player.gainXP(enemy.xpReward);
+
+        // Daily challenge score
+        if (typeof game !== 'undefined' && game.dailyChallenge && game.dailyChallenge.active) {
+            const points = enemy.isBoss ? 500 : enemy.isElite ? 100 : 10;
+            game.dailyChallenge.addScore(points);
+        }
         player.gold += enemy.goldReward;
         player.kills++;
 
