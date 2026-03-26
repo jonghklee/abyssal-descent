@@ -225,6 +225,15 @@ class Player extends Entity {
                         vy: Utils.rand(-1, 0),
                     }));
                 }
+                // Necromancer: skull trail
+                if (this.className === 'Necromancer') {
+                    particles.add(new Particle(this.x + Utils.rand(-5,5), this.y + Utils.rand(-5,5), {
+                        life: 0.25, size: Utils.rand(2,4), endSize: 0,
+                        color: Utils.randChoice(['#e040fb','#ce93d8','#9c27b0']),
+                        glow: true, glowSize: 5,
+                        vy: Utils.rand(-0.5, 0.5),
+                    }));
+                }
             }
 
             if (this.dashDuration <= 0) {
