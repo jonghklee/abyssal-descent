@@ -343,9 +343,16 @@ class Player extends Entity {
                     glowSize: 6,
                 }));
             }
-            // Green flash
+            // Green flash + heal number
             Utils.addFlash('#4caf50', 0.15);
             GameAudio.play('heal');
+            if (typeof game !== 'undefined' && game.combat) {
+                game.combat.damageNumbers.push({
+                    x: this.x, y: this.y - 20,
+                    text: `+${heal}`, color: '#4caf50',
+                    size: 14, life: 1.0, vy: -1.5, isCrit: false,
+                });
+            }
             return true;
         }
         return false;

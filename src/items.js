@@ -10,8 +10,8 @@ class ItemDrop {
         this.data = data;
         this.alive = true;
         this.bobTimer = Math.random() * Math.PI * 2;
-        this.magnetRange = 80;
-        this.pickupRange = 20;
+        this.magnetRange = 100; // Base magnet range (increased for better feel)
+        this.pickupRange = 24;
 
         // For auto-pickup items
         this.autoPickup = type === 'gold' || type === 'xpOrb';

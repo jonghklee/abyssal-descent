@@ -339,6 +339,12 @@ class Game {
         // Biome setup
         if (this.biomeSystem) this.biomeSystem.setFloor(this.floor);
 
+        // Small HP recovery on floor clear (10% of max)
+        if (this.player) {
+            const healAmt = Math.floor(this.player.maxHp * 0.1);
+            this.player.hp = Math.min(this.player.hp + healAmt, this.player.maxHp);
+        }
+
         // Floor transition
         this.ui.startFloorTransition(this.floor);
         this.ui.notify(`Entering Floor ${this.floor}`, '#64ffda');
