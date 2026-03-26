@@ -674,12 +674,14 @@ class GameUI {
             // Run highlight
             ctx.textAlign = 'center';
             const highlights = [];
-            if (player.kills >= 100) highlights.push(`${player.kills} kills!`);
-            if (player.maxCombo >= 15) highlights.push(`${player.maxCombo}x combo!`);
+            if (typeof game !== 'undefined' && game.meta) {
+                if (player.kills > (game.meta.data.bestKills || 0)) highlights.push('🏆 NEW BEST KILLS!');
+                if (floor > (game.meta.data.bestFloor || 0)) highlights.push('🏆 NEW BEST FLOOR!');
+            }
+            if (player.kills >= 100) highlights.push(`${player.kills} kills`);
+            if (player.maxCombo >= 15) highlights.push(`${player.maxCombo}x combo`);
             if (player._lastStandUsed) highlights.push('Last Stand!');
-            if (player.relics && player.relics.length >= 5) highlights.push(`${player.relics.length} relics!`);
-            if (typeof game !== 'undefined' && game.killStreak?.bestStreak >= 10) highlights.push(`${game.killStreak.bestStreak} streak!`);
-            if (player._maxHit >= 50) highlights.push(`${player._maxHit} max hit!`);
+            if (player._maxHit >= 50) highlights.push(`${player._maxHit} max hit`);
             if (highlights.length > 0) {
                 ctx.fillStyle = '#546e7a';
                 ctx.font = '9px monospace';
