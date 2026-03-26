@@ -259,9 +259,13 @@ class CombatSystem {
                     if (isCrit) {
                         Utils.addFreeze(3);
                         Utils.addFlash('#ffeb3b', 0.15);
-                        // Screen slash VFX on high-damage crits
                         if (typeof game !== 'undefined' && game.vfx && dmg > 30) {
                             game.vfx.critSlash(Utils.angle(player.x, player.y, enemy.x, enemy.y));
+                        }
+                        // Lucky Strike synergy: crits drop gold
+                        if (player.critGold) {
+                            player.gold += 5;
+                            particles.itemPickup(enemy.x, enemy.y, '#ffd740');
                         }
                     }
 

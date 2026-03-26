@@ -1341,8 +1341,22 @@ class Game {
 
         // Player death
         if (!this.player.alive) {
+            // Holy Guardian synergy revive (full HP + 10s invuln)
+            if (this.player.holyRevive) {
+                this.player.holyRevive = false;
+                this.player.alive = true;
+                this.player.hp = this.player.maxHp;
+                this.player.invulnerable = 10;
+                particles.levelUpEffect(this.player.x, this.player.y);
+                particles.explosion(this.player.x, this.player.y, '#fff9c4', 50);
+                Utils.addShake(15);
+                Utils.addFlash('#fff9c4', 0.6);
+                Utils.addSlowMo(0.15, 1.5);
+                this.ui.notify('👼 HOLY GUARDIAN! Full HP + 10s Invulnerable!', '#fff9c4', 5);
+                GameAudio.play('levelUp');
+            }
             // Phoenix Feather revive check
-            if (this.player.hasRevive) {
+            else if (this.player.hasRevive) {
                 this.player.hasRevive = false;
                 this.player.alive = true;
                 this.player.hp = Math.floor(this.player.maxHp * 0.5);
