@@ -1072,6 +1072,15 @@ class Game {
                 this.ui.deathScreen = true;
                 this.ui.deathTimer = 0;
                 Utils.addShake(15);
+
+                // Close all overlays on death
+                if (this.luckWheel) this.luckWheel.active = false;
+                if (this.gacha) this.gacha.active = false;
+                if (this.events && this.events.activeEvent) this.events.activeEvent = null;
+                if (this.slotMachine) this.slotMachine.active = false;
+                if (this.forge) this.forge.active = false;
+                if (this.curseSystem) this.curseSystem.offerActive = false;
+                this.weaponPickup = null;
                 Utils.addSlowMo(0.1, 1.5);
                 particles.explosion(this.player.x, this.player.y, '#ff1744', 50);
 
