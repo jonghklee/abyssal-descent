@@ -1264,6 +1264,10 @@ class Game {
                 if (this.vfx) this.vfx.bossEntrance();
                 Utils.addShake(8);
                 GameAudio.play('trap');
+                // Small heal before boss fight (20% HP)
+                const bossHeal = Math.floor(this.player.maxHp * 0.2);
+                this.player.hp = Math.min(this.player.hp + bossHeal, this.player.maxHp);
+                this.ui.notify(`Prepared for battle! +${bossHeal} HP`, '#4caf50', 2);
                 // First boss tip
                 if (!this._bossSeenBefore) {
                     this._bossSeenBefore = true;
