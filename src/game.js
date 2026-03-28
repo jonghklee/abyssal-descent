@@ -1224,14 +1224,14 @@ class Game {
 
         // Check shrine/water room events (only if no overlay active)
         if (!anyOverlayActive && this.dungeon.tiles[playerTY] && this.dungeon.tiles[playerTY][playerTX] === TILE.WATER) {
-            const shrineKey = `shrine_${playerTX},${playerTY}`;
-            if (!this.openedChests.has(shrineKey)) {
-                for (const room of this.dungeon.rooms) {
-                    if (room.type === 'shrine' && room.contains(playerTX, playerTY)) {
+            for (const room of this.dungeon.rooms) {
+                if (room.type === 'shrine' && room.contains(playerTX, playerTY)) {
+                    const shrineKey = `shrine_room_${room.x},${room.y}`;
+                    if (!this.openedChests.has(shrineKey)) {
                         this.openedChests.add(shrineKey);
                         this.events.triggerRandomEvent(room);
-                        break;
                     }
+                    break;
                 }
             }
         }
